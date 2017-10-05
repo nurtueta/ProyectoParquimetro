@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 
-public class VenInspector {
+public class VenInspector extends JFrame{
 
 	private JFrame frame;
 
