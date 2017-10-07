@@ -7,22 +7,32 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import java.sql.Types;
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 
+import com.mysql.jdbc.Statement;
+
 import quick.dbtable.*;
-import javax.swing.JList; 
+import javax.swing.JList;
+import javax.swing.AbstractListModel;
+import java.awt.FlowLayout;
+import javax.swing.BoxLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent; 
 
 
 @SuppressWarnings("serial")
@@ -34,9 +44,15 @@ public class VenConsultas extends javax.swing.JFrame
    private JButton btnEjecutar;
    private DBTable tabla;    
    private JScrollPane scrConsulta;
+   private JList list;
+   private JList list_1;
+   private DefaultListModel DLM;
+   private DefaultListModel DLM_1;
+   private JButton btnNewButton;
    
    private String usuario;
    private String clave;
+  
 
    
    
@@ -123,18 +139,84 @@ public class VenConsultas extends javax.swing.JFrame
            
          }
          
-         JList list = new JList();
-         list.setBounds(392, 186, 194, 375);
-         getContentPane().add(list);
+         JPanel panel = new JPanel();
+         panel.setBounds(392, 186, 392, 375);
+         getContentPane().add(panel);
+         panel.setLayout(null);
          
-         JList list_1 = new JList();
-         list_1.setBounds(590, 186, 194, 375);
-         getContentPane().add(list_1);
+         JScrollPane scrollPane = new JScrollPane();
+         scrollPane.setBounds(0, 45, 194, 330);
+         panel.add(scrollPane);
+         
+         DLM = new DefaultListModel();
+         list = new JList(DLM);               
+         list.addMouseListener(new MouseAdapter() {
+          	public void mouseClicked(MouseEvent arg0) {         		
+          		DLM_1.clear();
+          		if(DLM.getSize()> 0) {         			
+          			String selected = (String) list.getSelectedValue();
+          			selected = "'"+selected+"'";
+          			
+ 					try {
+ 						Statement st = (Statement) tabla.getConnection().createStatement();
+ 						ResultSet rs = st.executeQuery("SELECT COLUMN_NAME FROM "
+ 	         					+ "INFORMATION_SCHEMA.COLUMNS "
+ 	         					+ "WHERE TABLE_SCHEMA='parquimetros' "
+ 	         					+ "AND TABLE_NAME="+selected );
+ 						boolean sig = rs.first();
+ 						while(sig) {
+ 							DLM_1.addElement(rs.getString(1));
+ 							sig = rs.next();
+ 						}
+ 					} catch (SQLException e) {
+ 						e.printStackTrace();
+ 					}         			        			
+          		}  
+          	}
+         });
+         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+         
+         
+         scrollPane.setViewportView(list);
+         {
+          	btnNewButton = new JButton("Refrescar");
+          	btnNewButton.addActionListener(new ActionListener() {
+          		public void actionPerformed(ActionEvent arg0) {
+          			DLM.clear();        			        			
+          			try {
+ 						Statement st = (Statement) tabla.getConnection().createStatement();
+ 						ResultSet rs = st.executeQuery("SELECT table_name FROM "
+ 								+ "information_schema.tables where "
+ 								+ "table_schema='parquimetros'");
+ 						boolean sig = rs.first();
+ 						while(sig) {
+ 							DLM.addElement(rs.getString(1));
+ 							sig = rs.next();												
+ 						}      			
+          			} catch (SQLException e) {
+ 						e.printStackTrace();
+ 					}
+         		}
+          	});
+          	btnNewButton.setBounds(139, 11, 111, 23);
+          	panel.add(btnNewButton);
+         }
+         
+         JScrollPane scrollPane_1 = new JScrollPane();
+         scrollPane_1.setBounds(197, 45, 194, 330);
+         panel.add(scrollPane_1);
+         
+         DLM_1 = new DefaultListModel();
+         list_1 = new JList(DLM_1);
+         scrollPane_1.setViewportView(list_1);
+         
+         
       } catch (Exception e) {
          e.printStackTrace();
       }
    }
 
+   
    private void thisComponentShown(ComponentEvent evt) 
    {
       this.conectarBD();
