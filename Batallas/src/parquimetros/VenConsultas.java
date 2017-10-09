@@ -1,4 +1,5 @@
 package parquimetros;
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,7 +29,6 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent; 
 
-
 @SuppressWarnings("serial")
 public class VenConsultas extends javax.swing.JFrame 
 {
@@ -47,8 +47,8 @@ public class VenConsultas extends javax.swing.JFrame
 	private String usuario;
 	private String clave;
 	private JButton btnNewButton;
-
-
+	
+	
 	public static void main(String[] args) {
 
 		VenConsultas inst = new VenConsultas();
@@ -61,8 +61,6 @@ public class VenConsultas extends javax.swing.JFrame
 	public VenConsultas() 
 	{
 		super();
-		this.usuario = "admin";
-		this.clave = "admin";
 		initGUI();
 	}
 
@@ -80,7 +78,7 @@ public class VenConsultas extends javax.swing.JFrame
 				}
 			});
 			getContentPane().setLayout(null);
-			
+
 			btnNewButton = new JButton("Reconectar");
 			btnNewButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -312,6 +310,7 @@ public class VenConsultas extends javax.swing.JFrame
 
 	}
 
+
 	private void desconectarBD()
 	{
 		try
@@ -371,4 +370,7 @@ public class VenConsultas extends javax.swing.JFrame
 		}
 
 	}
+
+
+
 }
