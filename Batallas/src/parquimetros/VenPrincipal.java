@@ -19,6 +19,8 @@ import java.awt.event.ActionEvent;
 import quick.dbtable.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 public class VenPrincipal {
 
@@ -137,6 +139,24 @@ public class VenPrincipal {
 		userBox.setColumns(10);
 		
 		pwdBox = new JPasswordField("contrasena");
+		pwdBox.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent arg0) {
+				
+				pwdBox.setText("");
+				
+			}
+		});
+		
+		userBox.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent arg0) {
+				
+				userBox.setText("");
+				
+			}
+		});
+		
 		pwdBox.setEchoChar('*');
 		pwdBox.setToolTipText("Contrase\u00F1a");
 		pwdBox.setBounds(74, 133, 86, 20);
