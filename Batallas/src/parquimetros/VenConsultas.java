@@ -71,18 +71,10 @@ public class VenConsultas extends javax.swing.JFrame
 				}
 			});
 			getContentPane().setLayout(null);
-
-			btnNewButton = new JButton("Reconectar");
-			btnNewButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					desconectarBD();
-					conectarBD();
-				}
-			});
 			{
 				btnRefrescar = new JButton();
 				btnRefrescar.setEnabled(false);
-				btnRefrescar.setBounds(591, 186, 101, 29);
+				btnRefrescar.setBounds(539, 197, 101, 29);
 				getContentPane().add(btnRefrescar);
 				btnRefrescar.setText("Refrescar");
 				btnRefrescar.addActionListener(new ActionListener() {
@@ -127,14 +119,14 @@ public class VenConsultas extends javax.swing.JFrame
 					}
 				});
 			}
-			btnNewButton.setBounds(480, 186, 101, 29);
-			getContentPane().add(btnNewButton);
 			{
 				pnlConsulta = new JPanel();
 				pnlConsulta.setBounds(0, 0, 784, 186);
 				getContentPane().add(pnlConsulta);
+				pnlConsulta.setLayout(null);
 				{
 					scrConsulta = new JScrollPane();
+					scrConsulta.setBounds(36, 5, 566, 176);
 					pnlConsulta.add(scrConsulta);
 					{
 						txtConsulta = new JTextArea();
@@ -149,6 +141,7 @@ public class VenConsultas extends javax.swing.JFrame
 				}
 				{
 					btnEjecutar = new JButton();
+					btnEjecutar.setBounds(647, 11, 101, 29);
 					btnEjecutar.setEnabled(false);
 					pnlConsulta.add(btnEjecutar);
 					btnEjecutar.setText("Ejecutar");
@@ -160,8 +153,19 @@ public class VenConsultas extends javax.swing.JFrame
 				}
 				{
 					botonBorrar = new JButton();
+					botonBorrar.setBounds(647, 51, 101, 29);
 					pnlConsulta.add(botonBorrar);
 					botonBorrar.setText("Borrar");            
+					
+								btnNewButton = new JButton("Reconectar");
+								btnNewButton.setBounds(647, 146, 101, 29);
+								pnlConsulta.add(btnNewButton);
+								btnNewButton.addActionListener(new ActionListener() {
+									public void actionPerformed(ActionEvent e) {
+										desconectarBD();
+										conectarBD();
+									}
+								});
 					botonBorrar.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0) {
 							txtConsulta.setText("");            			
