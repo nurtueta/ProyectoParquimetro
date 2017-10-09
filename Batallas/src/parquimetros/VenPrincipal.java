@@ -1,17 +1,30 @@
 package parquimetros;
 
 import java.awt.EventQueue;
+import java.awt.Window;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.awt.event.ActionEvent;
+import quick.dbtable.*;
 
 public class VenPrincipal {
 
 	private JFrame frame;
-	private JTextField txtUsuario;
+	private JTextField userBox;
 	private JPasswordField pwdBox;
+	protected Connection conexionBD = null;
+
 
 	/**
 	 * Launch the application.
@@ -27,6 +40,7 @@ public class VenPrincipal {
 				}
 			}
 		});
+		System.out.printf("hola");
 	}
 
 	/**
@@ -46,20 +60,142 @@ public class VenPrincipal {
 		frame.getContentPane().setLayout(null);
 		
 		JButton btnLogin = new JButton("Login");
+		btnLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				
+				String usuario = "admin";//userBox.getText();
+				String password ="admin";// new String(pwdBox.getPassword());
+	            String baseDatos = "datos";					// NO ESTOY SEGURO SI ES DATOS O PARQUIMETROS
+	            
+	            if(usuario == "admin" && password == "admin") {
+	            	
+	            	VenConsultas ventanaAdmin = new VenConsultas();
+					ventanaAdmin.setVisible(true);
+	            	frame.setVisible(false);
+	            	
+	            }
+	            else if(usuario=="inspector" && password =="inspector") {
+	            	
+	            	VenInspector ventanaAdmin = new VenInspector();
+	            	ventanaAdmin.setVisible(true);
+	            	frame.setVisible(false);
+	            	
+	            }
+	            else {
+	            	
+	            	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
+	            	   System.out.println(usuario);
+	            	   System.out.println(password);
+
+	            }
+	            
+	            
+	            
+	            /*try {
+				Statement stmt = conexionBD.createStatement();
+				String uriConexion = "jdbc:mysql://" + "localhost:3306" + "/" + baseDatos;
+
+		        String sql = "SELECT nombre_batalla, fecha " + 
+		                      "FROM batallas " +
+		                      "ORDER BY nombre_batalla";
+		        
+
+						if(usuario == "admin" && password == "admin") {
+							conexionBD = DriverManager.getConnection(uriConexion, usuario, password);
+							VenConsultas ventanaAdmin = new VenConsultas();
+							ventanaAdmin.setVisible(true);
+							
+							
+							
+						}
+							
+						else {
+							
+							
+					            String queryString = "SELECT legajo, password FROM Inspectores";
+					            ResultSet results = stmt.executeQuery(queryString);
+		
+					            while (results.next()) {
+					            String usr = results.getString("legajo");
+					            String pwd =  results.getString("password");
+		
+					               if ((usuario.equals(usr)) && (password.equals(pwd))) {
+					            	  VenInspector ventanaAdmin = new VenInspector();
+					            	  ventanaAdmin.setVisible(true);
+					            	  frame.setVisible(false);
+					                  JOptionPane.showMessageDialog(null, "Username and Password exist");  
+					               }
+					               else {
+		
+					            	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
+					               }
+					            }
+					            results.close();
+					        
+							
+						}
+							
+						
+					}catch (SQLException e) {
+
+			            System.out.println(e);
+			        }*/
+		       } 
+		});
 		btnLogin.setBounds(261, 109, 89, 23);
 		frame.getContentPane().add(btnLogin);
 		
-		txtUsuario = new JTextField();
-		txtUsuario.setText("Usuario");
-		txtUsuario.setBounds(74, 84, 86, 20);
-		frame.getContentPane().add(txtUsuario);
-		txtUsuario.setColumns(10);
+		userBox = new JTextField();
+		userBox.setText("Usuario");
+		userBox.setBounds(74, 84, 86, 20);
+		frame.getContentPane().add(userBox);
+		userBox.setColumns(10);
 		
-		pwdBox = new JPasswordField();
+		pwdBox = new JPasswordField("contrasena");
 		pwdBox.setEchoChar('*');
 		pwdBox.setToolTipText("Contrase\u00F1a");
 		pwdBox.setBounds(74, 133, 86, 20);
 		frame.getContentPane().add(pwdBox);
 		pwdBox.setColumns(10);
 	}
+	
+	
+	private void conectarBD()
+	   {
+	      if (this.conexionBD == null)
+	      {
+	        
+	    	  try
+	         {
+	            Class.forName("com.mysql.jdbc.Driver").newInstance();
+	         }
+	         catch (Exception ex)
+	         {
+	            System.out.println(ex.getMessage());
+	         }
+	        
+	         try
+	         {
+	            String servidor = "localhost:3306";
+	            String baseDatos = "parquimetros";
+	            String usuario = userBox.getText();
+	            String clave = pwdBox.getPassword().toString();
+	            String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos;
+	   
+	            this.conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
+	         }
+	         catch (SQLException ex)
+	         {
+	        	
+	            /*JOptionPane.showMessageDialog(this,
+	                                          "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
+	                                          "Error",
+	                                          JOptionPane.ERROR_MESSAGE);
+	            System.out.println("SQLException: " + ex.getMessage());
+	            System.out.println("SQLState: " + ex.getSQLState());
+	            System.out.println("VendorError: " + ex.getErrorCode());*/
+	         }
+	      }
+	   }
 }
