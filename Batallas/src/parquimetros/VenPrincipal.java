@@ -112,7 +112,7 @@ public class VenPrincipal {
 					           	VenInspector ventanaAdmin = new VenInspector(results.getString(1));
 					           	ventanaAdmin.setVisible(true);
 					           	frame.setVisible(false);
-					            JOptionPane.showMessageDialog(null, "Username and Password exist");
+
 					        }
 					        else {
 					           	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
