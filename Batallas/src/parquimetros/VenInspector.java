@@ -40,12 +40,12 @@ public class VenInspector extends JFrame{
 	private String txtConsulta;
 	
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 
 		VenInspector inst = new VenInspector();
 		inst.setLocationRelativeTo(null);
 		inst.setVisible(true);
-	}
+	}*/
 
 	public VenInspector(String usuario) 
 	{
@@ -54,17 +54,15 @@ public class VenInspector extends JFrame{
 		initGUI();
 	}
 	
-	public VenInspector() {
-		
-	}
+	
 	/**
 	 * Create the application.
 	 */
-<<<<<<< HEAD
+
 	public void initGUI() {
-=======
-	public VenInspector() {
->>>>>>> ae39c90a343b019b9f8d31023dd21458c6971e48
+
+
+
 		getContentPane().setLayout(null);
 		
 		btnIngresarPatente = new JButton("Ingresar Patente");
@@ -122,12 +120,12 @@ public class VenInspector extends JFrame{
 		tableMuestra = new JTable();
 		tableMuestra.setBounds(33, 146, 571, 161);
 		getContentPane().add(tableMuestra);
-<<<<<<< HEAD
-=======
+
+
 	}
 	public VenInspector(String usuario, String clave) {
 
->>>>>>> ae39c90a343b019b9f8d31023dd21458c6971e48
+
 		initialize();
 	}
 
