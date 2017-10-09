@@ -114,11 +114,22 @@ public class VenPrincipal {
 							
 								conexionBD = DriverManager.getConnection(uriConexion, "inspector", "inspector");
 								Statement stmt = conexionBD.createStatement();
-					            String queryString = "SELECT legajo, password FROM Inspectores";
+					            String queryString = "SELECT * FROM Inspectores where "+usuario+" legajo "+"AND md5( "+password+") = "+password;
 					            //select * from inspectores where (legajo=legajo and md5(password = password)
 					            ResultSet results = stmt.executeQuery(queryString);
-		
-					            while (results.next()) {
+					            if (results.first()) {
+					            	VenInspector ventanaAdmin = new VenInspector(results.getString(1),password);
+					            	  ventanaAdmin.setVisible(true);
+					            	  frame.setVisible(false);
+					                  JOptionPane.showMessageDialog(null, "Username and Password exist");  
+					               
+					            }
+					            else {
+					            	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
+
+					            }
+					            	
+					            /*while (results.next()) {
 					            String usr = results.getString("legajo");
 					            String pwd =  results.getString("password");
 		
@@ -132,7 +143,7 @@ public class VenPrincipal {
 		
 					            	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
 					               }
-					            }
+					            }*/
 					            results.close();
 					        
 							
