@@ -52,6 +52,8 @@ public class VenConsultas extends javax.swing.JFrame
 	public VenConsultas() 
 	{
 		super();
+		usuario = "admin";
+		clave = "admin";
 		initGUI();
 	}
 
