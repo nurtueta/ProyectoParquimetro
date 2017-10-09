@@ -1,5 +1,6 @@
 package parquimetros;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -50,12 +51,10 @@ public class VenInspector extends JFrame{
 	 */
 
 	public void initGUI() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
-
-
+		setPreferredSize(new Dimension(800, 600));
+		setBounds(100, 100, 450, 300);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setVisible(true);
 
 		getContentPane().setLayout(null);
 		
