@@ -76,55 +76,7 @@ public class VenPrincipal {
 	            	
 	            }
 	            else if(usuario.equals("inspector") && password.equals("inspector")) {
-	            	try {
-					Statement stmt = conexionBD.createStatement();
-					String uriConexion = "jdbc:mysql://" + "localhost:3306" + "/" + baseDatos;
-
-			        String sql = "SELECT nombre_batalla, fecha " + 
-			                      "FROM batallas " +
-			                      "ORDER BY nombre_batalla";
-			        
-
-							if(usuario == "admin" && password == "admin") {
-								conexionBD = DriverManager.getConnection(uriConexion, usuario, password);
-								VenConsultas ventanaAdmin = new VenConsultas();
-								ventanaAdmin.setVisible(true);
-								
-								
-								
-							}
-								
-							else {
-								
-								
-						            String queryString = "SELECT legajo, password FROM Inspectores";
-						            ResultSet results = stmt.executeQuery(queryString);
-			
-						            while (results.next()) {
-						            String usr = results.getString("legajo");
-						            String pwd =  results.getString("password");
-			
-						               if ((usuario.equals(usr)) && (password.equals(pwd))) {
-						            	  VenInspector ventanaAdmin = new VenInspector();
-						            	  ventanaAdmin.setVisible(true);
-						            	  frame.setVisible(false);
-						                  JOptionPane.showMessageDialog(null, "Username and Password exist");  
-						               }
-						               else {
-			
-						            	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
-						               }
-						            }
-						            results.close();
-						        
-								
-							}
-								
-							
-						}catch (SQLException e) {
-
-				            System.out.println(e);
-				        } //TERMINAR DE COMENTAR ACA
+	            	
 	            	VenInspector ventanaAdmin = new VenInspector();
 	            	ventanaAdmin.setVisible(true);
 	            	frame.setVisible(false);
@@ -140,7 +92,55 @@ public class VenPrincipal {
 	            
 	            
 	            
-	            
+	            /*try {
+				Statement stmt = conexionBD.createStatement();
+				String uriConexion = "jdbc:mysql://" + "localhost:3306" + "/" + baseDatos;
+
+		        String sql = "SELECT nombre_batalla, fecha " + 
+		                      "FROM batallas " +
+		                      "ORDER BY nombre_batalla";
+		        
+
+						if(usuario == "admin" && password == "admin") {
+							conexionBD = DriverManager.getConnection(uriConexion, usuario, password);
+							VenConsultas ventanaAdmin = new VenConsultas();
+							ventanaAdmin.setVisible(true);
+							
+							
+							
+						}
+							
+						else {
+							
+							
+					            String queryString = "SELECT legajo, password FROM Inspectores";
+					            ResultSet results = stmt.executeQuery(queryString);
+		
+					            while (results.next()) {
+					            String usr = results.getString("legajo");
+					            String pwd =  results.getString("password");
+		
+					               if ((usuario.equals(usr)) && (password.equals(pwd))) {
+					            	  VenInspector ventanaAdmin = new VenInspector();
+					            	  ventanaAdmin.setVisible(true);
+					            	  frame.setVisible(false);
+					                  JOptionPane.showMessageDialog(null, "Username and Password exist");  
+					               }
+					               else {
+		
+					            	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
+					               }
+					            }
+					            results.close();
+					        
+							
+						}
+							
+						
+					}catch (SQLException e) {
+
+			            System.out.println(e);
+			        } *///TERMINAR DE COMENTAR ACA
 		       } 
 		});
 		btnLogin.setBounds(261, 109, 89, 23);
