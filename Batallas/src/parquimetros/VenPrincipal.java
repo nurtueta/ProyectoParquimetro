@@ -24,6 +24,7 @@ public class VenPrincipal {
 	private JTextField userBox;
 	private JPasswordField pwdBox;
 	protected Connection conexionBD = null;
+	
 
 
 	/**
@@ -66,8 +67,8 @@ public class VenPrincipal {
 				
 				String usuario = userBox.getText();
 				String password =new String(pwdBox.getPassword());
-	            String baseDatos = "datos";					// NO ESTOY SEGURO SI ES DATOS O PARQUIMETROS
-
+	            String baseDatos = "parquimetros";					// NO ESTOY SEGURO SI ES DATOS O PARQUIMETROS
+/*
 	            if(usuario .equals("admin") && password.equals("admin")) {
 	            	
 	            	VenConsultas ventanaAdmin = new VenConsultas();
@@ -77,7 +78,7 @@ public class VenPrincipal {
 	            }
 	            else if(usuario.equals("inspector") && password.equals("inspector")) {
 	            	
-	            	VenInspector ventanaAdmin = new VenInspector();
+	            	VenInspector ventanaAdmin = new VenInspector("inspector","inspector");
 	            	ventanaAdmin.setVisible(true);
 	            	frame.setVisible(false);
 	            	
@@ -89,16 +90,14 @@ public class VenPrincipal {
 	            	   System.out.println(password);
 
 	            }
+	            */
 	            
 	            
-	            
-	            /*try {
+	            try {
 				Statement stmt = conexionBD.createStatement();
 				String uriConexion = "jdbc:mysql://" + "localhost:3306" + "/" + baseDatos;
 
-		        String sql = "SELECT nombre_batalla, fecha " + 
-		                      "FROM batallas " +
-		                      "ORDER BY nombre_batalla";
+		        
 		        
 
 						if(usuario == "admin" && password == "admin") {
@@ -121,7 +120,7 @@ public class VenPrincipal {
 					            String pwd =  results.getString("password");
 		
 					               if ((usuario.equals(usr)) && (password.equals(pwd))) {
-					            	  VenInspector ventanaAdmin = new VenInspector();
+					            	  VenInspector ventanaAdmin = new VenInspector(usuario,password);
 					            	  ventanaAdmin.setVisible(true);
 					            	  frame.setVisible(false);
 					                  JOptionPane.showMessageDialog(null, "Username and Password exist");  
@@ -140,7 +139,7 @@ public class VenPrincipal {
 					}catch (SQLException e) {
 
 			            System.out.println(e);
-			        } *///TERMINAR DE COMENTAR ACA
+			        } //TERMINAR DE COMENTAR ACA
 		       } 
 		});
 		btnLogin.setBounds(261, 109, 89, 23);
