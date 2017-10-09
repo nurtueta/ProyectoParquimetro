@@ -14,6 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.awt.event.ActionEvent;
@@ -36,14 +38,14 @@ public class VenInspector extends JFrame{
 	private JTable tableMuestra;
 	
 	private DBTable tabla;
-	private String usuario;
+	private String legajo;
 	private String clave;
 	private String txtConsulta;
 
 	public VenInspector(String u) 
 	{
 		super();
-		this.usuario = u;
+		this.legajo = u;
 		initGUI();
 	}
 	/**
@@ -51,18 +53,32 @@ public class VenInspector extends JFrame{
 	 */
 
 	public void initGUI() {
-		setPreferredSize(new Dimension(800, 600));
-		setBounds(100, 100, 450, 300);
+		
+		setBounds(100, 100, 800, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				//desconectarBD();
+			}
+		});
 
 		getContentPane().setLayout(null);
 		
 		btnIngresarPatente = new JButton("Ingresar Patente");
+		btnIngresarPatente.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnPatente.setEnabled(true);
+				tfPatente.setEnabled(true);
+				conectarBD();
+				
+			}
+		});
 		btnIngresarPatente.setBounds(107, 12, 174, 25);
 		getContentPane().add(btnIngresarPatente);
 		
 		btnIngresarParquimetro = new JButton("Ingresar Parquimetro");
+		btnIngresarParquimetro.setEnabled(false);
 		btnIngresarParquimetro.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 			}
@@ -114,24 +130,22 @@ public class VenInspector extends JFrame{
 		tableMuestra.setBounds(33, 146, 571, 161);
 		getContentPane().add(tableMuestra);
 
-
 	}
 
 
-	private void conectarBD()
-	{
-		try
-		{
+	private void conectarBD(){
+		try{
 			String driver ="com.mysql.jdbc.Driver";
 			String servidor = "localhost:3306";
 			String baseDatos = "parquimetros";
 			String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos;
 
 			//establece una conexión con la  B.D. "parquimetros"  usando directamante una tabla DBTable    
-			tabla.connectDatabase(driver, uriConexion, usuario, clave);
+			String a="inspector";
+			String b="inspector";
+			tabla.connectDatabase(driver, uriConexion,a,b);
 		}
-		catch (SQLException ex)
-		{
+		catch (SQLException ex){
 			JOptionPane.showMessageDialog(this,
 					"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
 					"Error",
@@ -139,47 +153,37 @@ public class VenInspector extends JFrame{
 			System.out.println("SQLException: " + ex.getMessage());
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
-		}
-		catch (ClassNotFoundException e)
-		{			
+		}catch (ClassNotFoundException e){			
 			e.printStackTrace();
 		}
 
 	}
 
-	private void desconectarBD()
-	{
-		try
-		{
+	private void desconectarBD(){
+		try{
 			tabla.close();            
 		}
-		catch (SQLException ex)
-		{
+		catch (SQLException ex){
 			System.out.println("SQLException: " + ex.getMessage());
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
 		}      
 	}
 
-	private void refrescarTabla()
-	{
-		try
-		{    
+	private void refrescarTabla(){
+		try{    
 			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
 			tabla.setSelectSql(this.txtConsulta);
 
 			// obtenemos el modelo de la tabla a partir de la consulta para 
 			// modificar la forma en que se muestran de algunas columnas  
 			tabla.createColumnModelFromQuery();    	    
-			for (int i = 0; i < tabla.getColumnCount(); i++)
-			{ // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-				if	 (tabla.getColumn(i).getType()==Types.TIME)  
-				{    		 
+			for (int i = 0; i < tabla.getColumnCount(); i++){ // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
+				if	 (tabla.getColumn(i).getType()==Types.TIME)  {    		 
 					tabla.getColumn(i).setType(Types.CHAR);  
 				}
 				// cambiar el formato en que se muestran los valores de tipo DATE
-				if	 (tabla.getColumn(i).getType()==Types.DATE)
-				{
+				if	 (tabla.getColumn(i).getType()==Types.DATE){
 					tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
 				}
 			}  
@@ -188,12 +192,7 @@ public class VenInspector extends JFrame{
 			// No es necesario establecer  una conexión, crear una sentencia y recuperar el 
 			// resultado en un resultSet, esto lo hace automáticamente la tabla (DBTable) a 
 			// patir  de  la conexión y la consulta seteadas con connectDatabase() y setSelectSql() respectivamente.
-
-
-
-		}
-		catch (SQLException ex)
-		{
+		}catch (SQLException ex){
 			// en caso de error, se muestra la causa en la consola
 			System.out.println("SQLException: " + ex.getMessage());
 			System.out.println("SQLState: " + ex.getSQLState());
@@ -201,9 +200,7 @@ public class VenInspector extends JFrame{
 			JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
 					ex.getMessage() + "\n", 
 					"Error al ejecutar la consulta.",
-					JOptionPane.ERROR_MESSAGE);
-
-		}
+					JOptionPane.ERROR_MESSAGE);	}
 
 	}
 }
