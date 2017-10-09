@@ -118,7 +118,7 @@ public class VenPrincipal {
 					            //select * from inspectores where (legajo=legajo and md5(password = password)
 					            ResultSet results = stmt.executeQuery(queryString);
 					            if (results.first()) {
-					            	VenInspector ventanaAdmin = new VenInspector(results.getString(1),password);
+					            	VenInspector ventanaAdmin = new VenInspector(results.getString(1));
 					            	  ventanaAdmin.setVisible(true);
 					            	  frame.setVisible(false);
 					                  JOptionPane.showMessageDialog(null, "Username and Password exist");  

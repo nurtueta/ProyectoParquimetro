@@ -38,28 +38,22 @@ public class VenInspector extends JFrame{
 	private String usuario;
 	private String clave;
 	private String txtConsulta;
-	
-	
-	/*public static void main(String[] args) {
 
-		VenInspector inst = new VenInspector();
-		inst.setLocationRelativeTo(null);
-		inst.setVisible(true);
-	}*/
-
-	public VenInspector(String usuario) 
+	public VenInspector(String u) 
 	{
 		super();
-		this.usuario = usuario;
+		this.usuario = u;
 		initGUI();
 	}
-	
-	
 	/**
 	 * Create the application.
 	 */
 
 	public void initGUI() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 450, 300);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
 
 
 
@@ -123,21 +117,8 @@ public class VenInspector extends JFrame{
 
 
 	}
-	public VenInspector(String usuario, String clave) {
 
 
-		initialize();
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
-	
 	private void conectarBD()
 	{
 		try
