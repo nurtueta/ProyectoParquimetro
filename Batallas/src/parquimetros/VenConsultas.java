@@ -2,6 +2,10 @@ package parquimetros;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Types;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -48,17 +52,20 @@ public class VenConsultas extends javax.swing.JFrame
 
 	public static void main(String[] args) {
 
-		VenConsultas inst = new VenConsultas();
+		VenConsultas inst = new VenConsultas("admin","admin");
 		inst.setLocationRelativeTo(null);
 		inst.setVisible(true);
 
 	}
 
-	public VenConsultas() 
+	public VenConsultas() {
+		this("admin","admin");
+	}
+	public VenConsultas(String usuario, String clave) 
 	{
 		super();
-		usuario = "admin";
-		clave = "admin";
+		this.usuario = usuario;
+		this.clave = clave;
 		initGUI();
 	}
 
@@ -70,8 +77,13 @@ public class VenConsultas extends javax.swing.JFrame
 			setPreferredSize(new Dimension(800, 600));
 			this.setBounds(0, 0, 800, 600);
 			setVisible(true);
-			this.setTitle("Consultas (Utilizando DBTable)");
+			this.setTitle("Consultas");
 			this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+			this.addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
+					desconectarBD();
+				}
+			});
 			getContentPane().setLayout(null);
 			{
 				pnlConsulta = new JPanel();
@@ -157,21 +169,21 @@ public class VenConsultas extends javax.swing.JFrame
 								DLM_1.addElement(rs.getString(1));
 								sig = rs.next();
 							}
-						} catch (SQLException e) {
-							e.printStackTrace();
+						} catch (SQLException ex) {
+							salidaError(ex);
 						}  finally {
 							if(st != null) {
 								try {
 									st.close();
-								} catch (SQLException e) {
-									e.printStackTrace();
+								} catch (SQLException ex) {
+									salidaError(ex);
 								}
 							}
 							if(rs != null) {
 								try {
 									rs.close();
-								} catch (SQLException e) {
-									e.printStackTrace();
+								} catch (SQLException ex) {
+									salidaError(ex);
 								}
 							}
 						}         			        			
@@ -209,21 +221,21 @@ public class VenConsultas extends javax.swing.JFrame
 								DLM.addElement(rs.getString(1));
 								sig = rs.next();												
 							}      			
-						} catch (SQLException e) {
-							e.printStackTrace();
+						} catch (SQLException ex) {
+							salidaError(ex);
 						} finally {
 							if(st != null) {
 								try {
 									st.close();
-								} catch (SQLException e) {
-									e.printStackTrace();
+								} catch (SQLException ex) {
+									salidaError(ex);
 								}
 							}
 							if(rs != null) {
 								try {
 									rs.close();
-								} catch (SQLException e) {
-									e.printStackTrace();
+								} catch (SQLException ex) {
+									salidaError(ex);
 								}
 							}
 						}
@@ -232,7 +244,6 @@ public class VenConsultas extends javax.swing.JFrame
 				});
 			}
 
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -240,7 +251,18 @@ public class VenConsultas extends javax.swing.JFrame
 		conectarBD();
 
 	}
-
+	
+	private void salidaError(SQLException ex) {
+		JOptionPane.showMessageDialog(null,
+				ex.getMessage(),
+				"Error",
+				JOptionPane.ERROR_MESSAGE);
+		System.out.println("SQLException: " + ex.getMessage());
+		System.out.println("SQLState: " + ex.getSQLState());
+		System.out.println("VendorError: " + ex.getErrorCode());
+	}
+	
+	
 	private void btnEjecutarActionPerformed(ActionEvent evt) 
 	{
 		this.refrescarTabla();      
@@ -276,6 +298,19 @@ public class VenConsultas extends javax.swing.JFrame
 
 	}
 	
+	private void desconectarBD()
+	   {
+	         try
+	         {
+	            tabla.close();            
+	         }
+	         catch (SQLException ex)
+	         {
+	            System.out.println("SQLException: " + ex.getMessage());
+	            System.out.println("SQLState: " + ex.getSQLState());
+	            System.out.println("VendorError: " + ex.getErrorCode());
+	         }      
+	   }
 
 	private void refrescarTabla()
 	{
