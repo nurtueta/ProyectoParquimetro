@@ -94,16 +94,17 @@ public class VenPrincipal {
 	            
 	            
 	            try {
-				Statement stmt = conexionBD.createStatement();
+				
 				String uriConexion = "jdbc:mysql://" + "localhost:3306" + "/" + baseDatos;
 
 		        
 		        
 
 						if(usuario == "admin" && password == "admin") {
-							conexionBD = DriverManager.getConnection(uriConexion, usuario, password);
+							
 							VenConsultas ventanaAdmin = new VenConsultas();
 							ventanaAdmin.setVisible(true);
+							frame.setVisible(false);
 							
 							
 							
@@ -111,7 +112,8 @@ public class VenPrincipal {
 							
 						else {
 							
-							
+								conexionBD = DriverManager.getConnection(uriConexion, "inspector", "inspector");
+								Statement stmt = conexionBD.createStatement();
 					            String queryString = "SELECT legajo, password FROM Inspectores";
 					            ResultSet results = stmt.executeQuery(queryString);
 		
