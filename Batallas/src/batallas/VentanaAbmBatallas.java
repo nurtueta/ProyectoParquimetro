@@ -31,6 +31,8 @@ import javax.swing.WindowConstants;
 //import javax.swing.table.DefaultTableModel;
 //import javax.swing.table.TableModel;
 import javax.swing.text.MaskFormatter;
+
+import parquimetros.Fechas;
 import quick.dbtable.*;
 
 @SuppressWarnings("serial")
