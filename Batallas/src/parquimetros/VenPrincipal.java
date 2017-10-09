@@ -122,7 +122,7 @@ public class VenPrincipal {
 							
 				}catch (SQLException e) {
 
-			        JOptionPane.showMessageDialog(null, "Este cartelito te gusta Nico?");
+			        JOptionPane.showMessageDialog(null, "An Error ocurred trying to connect to the DATABASE");
 			    } 
 		    } 
 		});
