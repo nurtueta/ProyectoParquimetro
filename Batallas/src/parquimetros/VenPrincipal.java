@@ -24,6 +24,7 @@ public class VenPrincipal {
 	private JTextField userBox;
 	private JPasswordField pwdBox;
 	protected Connection conexionBD = null;
+	
 
 
 	/**
@@ -67,7 +68,7 @@ public class VenPrincipal {
 				String usuario = userBox.getText();
 				String password =new String(pwdBox.getPassword());
 	            String baseDatos = "parquimetros";					// NO ESTOY SEGURO SI ES DATOS O PARQUIMETROS
-
+/*
 	            if(usuario .equals("admin") && password.equals("admin")) {
 	            	
 	            	VenConsultas ventanaAdmin = new VenConsultas();
@@ -89,22 +90,21 @@ public class VenPrincipal {
 	            	   System.out.println(password);
 
 	            }
+	            */
 	            
 	            
-	            
-	            /*try {
-				Statement stmt = conexionBD.createStatement();
+	            try {
+				
 				String uriConexion = "jdbc:mysql://" + "localhost:3306" + "/" + baseDatos;
 
-		        String sql = "SELECT nombre_batalla, fecha " + 
-		                      "FROM batallas " +
-		                      "ORDER BY nombre_batalla";
+		        
 		        
 
-						if(usuario == "admin" && password == "admin") {
-							conexionBD = DriverManager.getConnection(uriConexion, usuario, password);
+						if(usuario.equals("admin") && password.equals("admin")) {
+							
 							VenConsultas ventanaAdmin = new VenConsultas();
 							ventanaAdmin.setVisible(true);
+							frame.setVisible(false);
 							
 							
 							
@@ -112,16 +112,29 @@ public class VenPrincipal {
 							
 						else {
 							
-							
-					            String queryString = "SELECT legajo, password FROM Inspectores";
+								conexionBD = DriverManager.getConnection(uriConexion, "inspector", "inspector");
+								Statement stmt = conexionBD.createStatement();
+					            String queryString = "SELECT * FROM Inspectores where "+usuario+" legajo "+"AND md5( "+password+") = "+password;
+					            //select * from inspectores where (legajo=legajo and md5(password = password)
 					            ResultSet results = stmt.executeQuery(queryString);
-		
-					            while (results.next()) {
+					            if (results.first()) {
+					            	VenInspector ventanaAdmin = new VenInspector(results.getString(1),password);
+					            	  ventanaAdmin.setVisible(true);
+					            	  frame.setVisible(false);
+					                  JOptionPane.showMessageDialog(null, "Username and Password exist");  
+					               
+					            }
+					            else {
+					            	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
+
+					            }
+					            	
+					            /*while (results.next()) {
 					            String usr = results.getString("legajo");
 					            String pwd =  results.getString("password");
 		
 					               if ((usuario.equals(usr)) && (password.equals(pwd))) {
-					            	  VenInspector ventanaAdmin = new VenInspector();
+					            	  VenInspector ventanaAdmin = new VenInspector(usuario,password);
 					            	  ventanaAdmin.setVisible(true);
 					            	  frame.setVisible(false);
 					                  JOptionPane.showMessageDialog(null, "Username and Password exist");  
@@ -130,7 +143,7 @@ public class VenPrincipal {
 		
 					            	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
 					               }
-					            }
+					            }*/
 					            results.close();
 					        
 							
@@ -140,7 +153,7 @@ public class VenPrincipal {
 					}catch (SQLException e) {
 
 			            System.out.println(e);
-			        } *///TERMINAR DE COMENTAR ACA
+			        } //TERMINAR DE COMENTAR ACA
 		       } 
 		});
 		btnLogin.setBounds(261, 109, 89, 23);
