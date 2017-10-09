@@ -2,8 +2,6 @@ package parquimetros;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Types;
@@ -48,6 +46,7 @@ public class VenConsultas extends javax.swing.JFrame
 
 	private String usuario;
 	private String clave;
+	private JButton btnNewButton;
 
 
 	public static void main(String[] args) {
@@ -69,8 +68,6 @@ public class VenConsultas extends javax.swing.JFrame
 		initGUI();
 	}
 
-
-
 	private void initGUI() 
 	{
 		try {
@@ -85,6 +82,64 @@ public class VenConsultas extends javax.swing.JFrame
 				}
 			});
 			getContentPane().setLayout(null);
+			
+			btnNewButton = new JButton("Reconectar");
+			btnNewButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					desconectarBD();
+					conectarBD();
+				}
+			});
+			{
+				btnRefrescar = new JButton();
+				btnRefrescar.setEnabled(false);
+				btnRefrescar.setBounds(591, 186, 101, 29);
+				getContentPane().add(btnRefrescar);
+				btnRefrescar.setText("Refrescar");
+				btnRefrescar.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						DLM.clear();     
+						Statement st = null;
+						ResultSet rs = null;
+						try {         				
+							st = (Statement) tabla.getConnection().createStatement();
+							rs = st.executeQuery("SELECT table_name FROM "
+									+ "information_schema.tables where "
+									+ "table_schema='parquimetros'");
+							boolean sig = rs.first();
+							while(sig) {
+								DLM.addElement(rs.getString(1));
+								sig = rs.next();												
+							}      			
+						} catch (SQLException ex) {
+							salidaError(ex);
+						} catch (NullPointerException ex2){
+							JOptionPane.showMessageDialog(null,
+									"Error",
+									"Error",
+									JOptionPane.ERROR_MESSAGE);
+						}
+						finally {					
+							if(st != null) {
+								try {
+									st.close();
+								} catch (SQLException ex) {
+									salidaError(ex);
+								}
+							}
+							if(rs != null) {
+								try {
+									rs.close();
+								} catch (SQLException ex) {
+									salidaError(ex);
+								}
+							}
+						}
+					}
+				});
+			}
+			btnNewButton.setBounds(480, 186, 101, 29);
+			getContentPane().add(btnNewButton);
 			{
 				pnlConsulta = new JPanel();
 				pnlConsulta.setBounds(0, 0, 784, 186);
@@ -105,6 +160,7 @@ public class VenConsultas extends javax.swing.JFrame
 				}
 				{
 					btnEjecutar = new JButton();
+					btnEjecutar.setEnabled(false);
 					pnlConsulta.add(btnEjecutar);
 					btnEjecutar.setText("Ejecutar");
 					btnEjecutar.addActionListener(new ActionListener() {
@@ -201,48 +257,6 @@ public class VenConsultas extends javax.swing.JFrame
 			DLM_1 = new DefaultListModel<String>();
 			list_1 = new JList<String>(DLM_1);
 			scrollPane_1.setViewportView(list_1);
-			{
-				btnRefrescar = new JButton();
-				btnRefrescar.setBounds(537, 186, 101, 29);
-				getContentPane().add(btnRefrescar);
-				btnRefrescar.setText("Refrescar");
-				btnRefrescar.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						DLM.clear();     
-						Statement st = null;
-						ResultSet rs = null;
-						try {         				
-							st = (Statement) tabla.getConnection().createStatement();
-							rs = st.executeQuery("SELECT table_name FROM "
-									+ "information_schema.tables where "
-									+ "table_schema='parquimetros'");
-							boolean sig = rs.first();
-							while(sig) {
-								DLM.addElement(rs.getString(1));
-								sig = rs.next();												
-							}      			
-						} catch (SQLException ex) {
-							salidaError(ex);
-						} finally {
-							if(st != null) {
-								try {
-									st.close();
-								} catch (SQLException ex) {
-									salidaError(ex);
-								}
-							}
-							if(rs != null) {
-								try {
-									rs.close();
-								} catch (SQLException ex) {
-									salidaError(ex);
-								}
-							}
-						}
-
-					}
-				});
-			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -251,7 +265,7 @@ public class VenConsultas extends javax.swing.JFrame
 		conectarBD();
 
 	}
-	
+
 	private void salidaError(SQLException ex) {
 		JOptionPane.showMessageDialog(null,
 				ex.getMessage(),
@@ -261,8 +275,7 @@ public class VenConsultas extends javax.swing.JFrame
 		System.out.println("SQLState: " + ex.getSQLState());
 		System.out.println("VendorError: " + ex.getErrorCode());
 	}
-	
-	
+
 	private void btnEjecutarActionPerformed(ActionEvent evt) 
 	{
 		this.refrescarTabla();      
@@ -279,7 +292,8 @@ public class VenConsultas extends javax.swing.JFrame
 
 			//establece una conexión con la  B.D. "parquimetros"  usando directamante una tabla DBTable    
 			tabla.connectDatabase(driver, uriConexion, usuario, clave);
-
+			btnEjecutar.setEnabled(true);
+			btnRefrescar.setEnabled(true);
 		}
 		catch (SQLException ex)
 		{
@@ -290,27 +304,29 @@ public class VenConsultas extends javax.swing.JFrame
 			System.out.println("SQLException: " + ex.getMessage());
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
+			btnEjecutar.setEnabled(false);
+			btnRefrescar.setEnabled(false);
 		}
 		catch (ClassNotFoundException e)
-		{
+		{			
 			e.printStackTrace();
 		}
 
 	}
-	
+
 	private void desconectarBD()
-	   {
-	         try
-	         {
-	            tabla.close();            
-	         }
-	         catch (SQLException ex)
-	         {
-	            System.out.println("SQLException: " + ex.getMessage());
-	            System.out.println("SQLState: " + ex.getSQLState());
-	            System.out.println("VendorError: " + ex.getErrorCode());
-	         }      
-	   }
+	{
+		try
+		{
+			tabla.close();            
+		}
+		catch (SQLException ex)
+		{
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}      
+	}
 
 	private void refrescarTabla()
 	{
