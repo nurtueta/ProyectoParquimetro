@@ -41,7 +41,6 @@ public class VenPrincipal {
 				}
 			}
 		});
-		System.out.printf("hola");
 	}
 
 	/**
