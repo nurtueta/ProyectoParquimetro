@@ -51,20 +51,18 @@ public class VenConsultas extends javax.swing.JFrame
 
 	public static void main(String[] args) {
 
-		VenConsultas inst = new VenConsultas("admin","admin");
+		VenConsultas inst = new VenConsultas();
 		inst.setLocationRelativeTo(null);
 		inst.setVisible(true);
 
 	}
 
-	public VenConsultas() {
-		this("admin","admin");
-	}
-	public VenConsultas(String usuario, String clave) 
+
+	public VenConsultas() 
 	{
 		super();
-		this.usuario = usuario;
-		this.clave = clave;
+		this.usuario = "admin";
+		this.clave = "admin";
 		initGUI();
 	}
 

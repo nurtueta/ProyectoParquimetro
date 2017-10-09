@@ -114,7 +114,7 @@ public class VenPrincipal {
 							
 								conexionBD = DriverManager.getConnection(uriConexion, "inspector", "inspector");
 								Statement stmt = conexionBD.createStatement();
-					            String queryString = "SELECT * FROM Inspectores where "+usuario+" legajo "+"AND md5( "+password+") = "+password;
+					            String queryString = "SELECT * FROM Inspectores where legajo = "+usuario+" AND password = md5('"+password+"')";
 					            //select * from inspectores where (legajo=legajo and md5(password = password)
 					            ResultSet results = stmt.executeQuery(queryString);
 					            if (results.first()) {
