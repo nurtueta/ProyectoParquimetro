@@ -68,93 +68,49 @@ public class VenPrincipal {
 				String usuario = userBox.getText();
 				String password =new String(pwdBox.getPassword());
 	            String baseDatos = "parquimetros";					// NO ESTOY SEGURO SI ES DATOS O PARQUIMETROS
-/*
-	            if(usuario .equals("admin") && password.equals("admin")) {
-	            	
-	            	VenConsultas ventanaAdmin = new VenConsultas();
-					ventanaAdmin.setVisible(true);
-	            	frame.setVisible(false);
-	            	
-	            }
-	            else if(usuario.equals("inspector") && password.equals("inspector")) {
-	            	
-	            	VenInspector ventanaAdmin = new VenInspector("inspector","inspector");
-	            	ventanaAdmin.setVisible(true);
-	            	frame.setVisible(false);
-	            	
-	            }
-	            else {
-	            	
-	            	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
-	            	   System.out.println(usuario);
-	            	   System.out.println(password);
 
-	            }
-	            */
-	            
 	            
 	            try {
 				
-				String uriConexion = "jdbc:mysql://" + "localhost:3306" + "/" + baseDatos;
+	            	String uriConexion = "jdbc:mysql://" + "localhost:3306" + "/" + baseDatos;
 
-		        
-		        
+	            	/*
+	            	 * Si el usuario ingresado es ADMIN
+	            	 */
+					if(usuario.equals("admin") && password.equals("admin")) {
+							
+						VenConsultas ventanaAdmin = new VenConsultas();
+						ventanaAdmin.setVisible(true);
+						frame.setVisible(false);
 
-						if(usuario.equals("admin") && password.equals("admin")) {
+					}
+					/*
+					 * Si el usuario ingresado es el legajo de un inspector valido
+					 */
+					else {
 							
-							VenConsultas ventanaAdmin = new VenConsultas();
-							ventanaAdmin.setVisible(true);
-							frame.setVisible(false);
-							
-							
-							
-						}
-							
-						else {
-							
-								conexionBD = DriverManager.getConnection(uriConexion, "inspector", "inspector");
-								Statement stmt = conexionBD.createStatement();
-					            String queryString = "SELECT * FROM Inspectores where legajo = "+usuario+" AND password = md5('"+password+"')";
-					            //select * from inspectores where (legajo=legajo and md5(password = password)
-					            ResultSet results = stmt.executeQuery(queryString);
-					            if (results.first()) {
-					            	VenInspector ventanaAdmin = new VenInspector(results.getString(1));
-					            	  ventanaAdmin.setVisible(true);
-					            	  frame.setVisible(false);
-					                  JOptionPane.showMessageDialog(null, "Username and Password exist");  
-					               
-					            }
-					            else {
-					            	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
+							conexionBD = DriverManager.getConnection(uriConexion, "inspector", "inspector");
+							Statement stmt = conexionBD.createStatement();
+					        String queryString = "SELECT * FROM Inspectores where legajo = "+usuario+" AND password = md5('"+password+"')";
 
-					            }
-					            	
-					            /*while (results.next()) {
-					            String usr = results.getString("legajo");
-					            String pwd =  results.getString("password");
-		
-					               if ((usuario.equals(usr)) && (password.equals(pwd))) {
-					            	  VenInspector ventanaAdmin = new VenInspector(usuario,password);
-					            	  ventanaAdmin.setVisible(true);
-					            	  frame.setVisible(false);
-					                  JOptionPane.showMessageDialog(null, "Username and Password exist");  
-					               }
-					               else {
-		
-					            	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
-					               }
-					            }*/
-					            results.close();
-					        
+					        ResultSet results = stmt.executeQuery(queryString);
+					        if (results.first()) {
+					           	VenInspector ventanaAdmin = new VenInspector(results.getString(1));
+					           	ventanaAdmin.setVisible(true);
+					           	frame.setVisible(false);
+					            JOptionPane.showMessageDialog(null, "Username and Password exist");
+					        }
+					        else {
+					           	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
+					        }
+					        results.close();
+					}
 							
-						}
-							
-						
-					}catch (SQLException e) {
+				}catch (SQLException e) {
 
-			            System.out.println(e);
-			        } //TERMINAR DE COMENTAR ACA
-		       } 
+			        JOptionPane.showMessageDialog(null, "Este cartelito te gusta Nico?");
+			    } 
+		    } 
 		});
 		btnLogin.setBounds(261, 109, 89, 23);
 		frame.getContentPane().add(btnLogin);
@@ -201,13 +157,10 @@ public class VenPrincipal {
 	         catch (SQLException ex)
 	         {
 	        	
-	            /*JOptionPane.showMessageDialog(this,
+	            JOptionPane.showMessageDialog(null,
 	                                          "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
 	                                          "Error",
 	                                          JOptionPane.ERROR_MESSAGE);
-	            System.out.println("SQLException: " + ex.getMessage());
-	            System.out.println("SQLState: " + ex.getSQLState());
-	            System.out.println("VendorError: " + ex.getErrorCode());*/
 	         }
 	      }
 	   }
