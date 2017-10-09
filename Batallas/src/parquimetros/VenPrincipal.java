@@ -66,7 +66,7 @@ public class VenPrincipal {
 				
 				String usuario = userBox.getText();
 				String password =new String(pwdBox.getPassword());
-	            String baseDatos = "datos";					// NO ESTOY SEGURO SI ES DATOS O PARQUIMETROS
+	            String baseDatos = "parquimetros";					// NO ESTOY SEGURO SI ES DATOS O PARQUIMETROS
 
 	            if(usuario .equals("admin") && password.equals("admin")) {
 	            	
@@ -77,7 +77,7 @@ public class VenPrincipal {
 	            }
 	            else if(usuario.equals("inspector") && password.equals("inspector")) {
 	            	
-	            	VenInspector ventanaAdmin = new VenInspector();
+	            	VenInspector ventanaAdmin = new VenInspector("inspector","inspector");
 	            	ventanaAdmin.setVisible(true);
 	            	frame.setVisible(false);
 	            	

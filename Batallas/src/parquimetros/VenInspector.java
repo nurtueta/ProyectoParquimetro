@@ -34,7 +34,7 @@ public class VenInspector extends JFrame{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					VenInspector window = new VenInspector();
+					VenInspector window = new VenInspector(null,null);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -46,6 +46,7 @@ public class VenInspector extends JFrame{
 	/**
 	 * Create the application.
 	 */
+<<<<<<< HEAD
 	public VenInspector() {
 		getContentPane().setLayout(null);
 		
@@ -104,6 +105,9 @@ public class VenInspector extends JFrame{
 		tableMuestra = new JTable();
 		tableMuestra.setBounds(33, 146, 571, 161);
 		getContentPane().add(tableMuestra);
+=======
+	public VenInspector(String usuario, String clave) {
+>>>>>>> b7e8ede5e4817517f6e0e7787868608a8feec81e
 		initialize();
 	}
 
