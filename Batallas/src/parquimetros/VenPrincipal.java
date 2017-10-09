@@ -111,8 +111,9 @@ public class VenPrincipal {
 
 					        ResultSet results = stmt.executeQuery(queryString);
 					        if (results.first()) {
+					        	String user= results.getString(1);
 					        	conexionBD.close();
-					           	VenInspector ventanaAdmin = new VenInspector(results.getString(1));
+					           	VenInspector ventanaAdmin = new VenInspector(user);
 					           	ventanaAdmin.setVisible(true);
 					           	frame.setVisible(false);
 
