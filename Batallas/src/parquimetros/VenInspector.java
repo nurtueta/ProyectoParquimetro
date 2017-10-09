@@ -15,7 +15,7 @@ public class VenInspector extends JFrame{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					VenInspector window = new VenInspector();
+					VenInspector window = new VenInspector(null,null);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -27,7 +27,7 @@ public class VenInspector extends JFrame{
 	/**
 	 * Create the application.
 	 */
-	public VenInspector() {
+	public VenInspector(String usuario, String clave) {
 		initialize();
 	}
 
