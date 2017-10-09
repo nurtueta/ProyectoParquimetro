@@ -203,6 +203,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
     		 if	 (tabla.getColumn(i).getType()==Types.DATE)
     		 {
     		    tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
+    		    
     		 }
           }  
     	  // actualizamos el contenido de la tabla.   	     	  

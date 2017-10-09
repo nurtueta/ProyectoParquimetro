@@ -64,18 +64,18 @@ public class VenPrincipal {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				
-				String usuario = "admin";//userBox.getText();
-				String password ="admin";// new String(pwdBox.getPassword());
+				String usuario = userBox.getText();
+				String password =new String(pwdBox.getPassword());
 	            String baseDatos = "datos";					// NO ESTOY SEGURO SI ES DATOS O PARQUIMETROS
-	            
-	            if(usuario == "admin" && password == "admin") {
+
+	            if(usuario .equals("admin") && password.equals("admin")) {
 	            	
 	            	VenConsultas ventanaAdmin = new VenConsultas();
 					ventanaAdmin.setVisible(true);
 	            	frame.setVisible(false);
 	            	
 	            }
-	            else if(usuario=="inspector" && password =="inspector") {
+	            else if(usuario.equals("inspector") && password.equals("inspector")) {
 	            	
 	            	VenInspector ventanaAdmin = new VenInspector();
 	            	ventanaAdmin.setVisible(true);
@@ -140,7 +140,7 @@ public class VenPrincipal {
 					}catch (SQLException e) {
 
 			            System.out.println(e);
-			        }*/
+			        } *///TERMINAR DE COMENTAR ACA
 		       } 
 		});
 		btnLogin.setBounds(261, 109, 89, 23);
