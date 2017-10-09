@@ -100,7 +100,7 @@ public class VenPrincipal {
 		        
 		        
 
-						if(usuario == "admin" && password == "admin") {
+						if(usuario.equals("admin") && password.equals("admin")) {
 							
 							VenConsultas ventanaAdmin = new VenConsultas();
 							ventanaAdmin.setVisible(true);
@@ -115,6 +115,7 @@ public class VenPrincipal {
 								conexionBD = DriverManager.getConnection(uriConexion, "inspector", "inspector");
 								Statement stmt = conexionBD.createStatement();
 					            String queryString = "SELECT legajo, password FROM Inspectores";
+					            //select * from inspectores where (legajo=legajo and md5(password = password)
 					            ResultSet results = stmt.executeQuery(queryString);
 		
 					            while (results.next()) {
