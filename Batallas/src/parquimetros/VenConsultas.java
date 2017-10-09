@@ -47,15 +47,6 @@ public class VenConsultas extends javax.swing.JFrame
 	private String usuario;
 	private String clave;
 	private JButton btnNewButton;
-	
-	
-	public static void main(String[] args) {
-
-		VenConsultas inst = new VenConsultas();
-		inst.setLocationRelativeTo(null);
-		inst.setVisible(true);
-
-	}
 
 
 	public VenConsultas() 
