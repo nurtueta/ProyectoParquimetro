@@ -335,6 +335,10 @@ public class VenInspector extends JFrame{
 		btnEliminar.setBounds(621, 407, 124, 23);
 		getContentPane().add(btnEliminar);
 		
+		JList list = new JList();
+		list.setBounds(531, 172, -73, -69);
+		getContentPane().add(list);
+		
 //		JScrollPane scrollPane = new JScrollPane();
 //		scrollPane.setBounds(578, 11, 167, 325);
 //		scrollPane.add(listaPatente);
