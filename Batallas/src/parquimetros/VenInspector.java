@@ -201,7 +201,6 @@ public class VenInspector extends JFrame{
 					String turno=null;
 					rs=st.executeQuery("SELECT CURTIME();");
 					rs.first();
-					Time horaDate=rs.getTime(1);
 					int hora=Integer.parseInt(rs.getString(1).substring(0,2));
 					if((hora<=8) && hora<14)
 						turno="M";
@@ -210,6 +209,10 @@ public class VenInspector extends JFrame{
 							turno="T";
 						else
 							turno="T";//aca va mensaje diciendo que no se puede conectar en su turno
+//							JOptionPane.showMessageDialog(null,
+//									"Esta fuera del horario de trabajo",
+//									"Ingreso invalido",
+//									JOptionPane.ERROR_MESSAGE);
 					rs.close();
 					
 					//comprobar si se conecta el legajo en su determinado turno
@@ -218,36 +221,35 @@ public class VenInspector extends JFrame{
 					" calle='"+calle+"' AND altura="+numero+" AND dia='"+dia+"' AND turno='"+turno+"';");
 					if(rs.first()) {
 						Id=Integer.parseInt(rs.getString(1));
-					}else
-						System.out.print("no se puede ingresar al turno");
-					
-					System.out.println(""+horaDate.toString());
-					//ingresar acceso
-					String horah=horaDate.toString();
-					st.executeUpdate("INSERT INTO Accede VALUES("+legajo+","+parquimetro+",CURDATE(),CURTIME());");
-					
-					System.out.println(""+horaDate.toString());
-					//crear multas
-					for(int i=0;i<LP.size();i++) {
-						patente=LP.getElementAt(i);
-						rs=st.executeQuery("SELECT patente FROM estacionados WHERE patente='"+patente+"' AND calle='"+calle+"' AND "
-							+"altura="+numero+";");
-						if(!rs.first()) {
-							//hacer multa
-							st.executeUpdate("INSERT INTO Multa(fecha,hora,patente,id_asociado_con) VALUES (CURDATE(),"
-									+ "CURTIME(),'"+patente+"',"+Id+");");
+						//ingresar acceso
+						st.executeUpdate("INSERT INTO Accede VALUES("+legajo+","+parquimetro+",CURDATE(),CURTIME());");
+						
+						//crear multas
+						for(int i=0;i<LP.size();i++) {
+							patente=LP.getElementAt(i);
+							rs=st.executeQuery("SELECT patente FROM estacionados WHERE patente='"+patente+"' AND calle='"+calle+"' AND "
+								+"altura="+numero+";");
+							if(!rs.first()) {
+								//hacer multa
+								st.executeUpdate("INSERT INTO Multa(fecha,hora,patente,id_asociado_con) VALUES (CURDATE(),"
+										+ "CURTIME(),'"+patente+"',"+Id+");");
+							}
+							rs.close();
 						}
-						rs.close();
-					}
-					LP.removeAllElements();
+						LP.removeAllElements();
+						
+						//mostrar multas
+						txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con "+
+								"WHERE calle='"+calle+"' AND altura="+numero+" AND legajo="+legajo+
+								" AND fecha=CURDATE();";
+						refrescarTabla();
 					
-					//mostrar multas
-					txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con WHERE ;";
-					refrescarTabla();
-					
-					//vaciar tabla patentes
-					
-//					refrescarTabla();      			
+					}else
+						JOptionPane.showMessageDialog(null,
+								"No puede ingresar al parquimetro en este turno",
+								"Ingreso invalido",
+								JOptionPane.ERROR_MESSAGE);
+				
 				} catch (SQLException ex) {
 					salidaError(ex);
 				} catch (NullPointerException ex2){
@@ -332,7 +334,7 @@ public class VenInspector extends JFrame{
 	private void crearTabla() {
 		// crea la tabla  
 		tabla = new DBTable();
-		tabla.setBounds(35, 180, 392, 375);
+		tabla.setBounds(35, 250, 500, 300);
 
 		// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
 		getContentPane().add(tabla);           
@@ -364,13 +366,10 @@ public class VenInspector extends JFrame{
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
 		}
-		catch (ClassNotFoundException e)
-		{			
+		catch (ClassNotFoundException e){			
 			e.printStackTrace();
 		}
-
 	}
-
 
 	private void desconectarBD()
 	{
