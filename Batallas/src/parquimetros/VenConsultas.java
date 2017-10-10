@@ -358,6 +358,8 @@ public class VenConsultas extends javax.swing.JFrame
 	{
 		try
 		{    
+		
+			
 			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
 			tabla.setSelectSql(this.txtConsulta.getText().trim());
 

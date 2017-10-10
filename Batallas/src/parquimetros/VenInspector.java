@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.JList;
 import java.awt.Color;
+import javax.swing.JScrollPane;
 
 public class VenInspector extends JFrame{
 
@@ -48,6 +49,7 @@ public class VenInspector extends JFrame{
 	private DefaultListModel<String> LP;
 	
 	private DBTable tabla;
+	private DBTable tabla2;
 	private String legajo;
 	private String clave;
 	private String txtConsulta;
@@ -102,7 +104,7 @@ public class VenInspector extends JFrame{
 		
 		
 		JButton btnAtras = new JButton("Menu Principal");
-		btnAtras.setBounds(200, 200, 150, 36);
+		btnAtras.setBounds(10, 12, 114, 25);
 		getContentPane().add(btnAtras);
 		
 		btnAtras.addActionListener(new ActionListener() {
@@ -117,7 +119,7 @@ public class VenInspector extends JFrame{
 		});
 		
 		
-		btnIngresarPatente.setBounds(107, 12, 174, 25);
+		btnIngresarPatente.setBounds(144, 12, 174, 25);
 		getContentPane().add(btnIngresarPatente);
 		
 		btnIngresarParquimetro = new JButton("Ingresar Parquimetro");
@@ -133,7 +135,7 @@ public class VenInspector extends JFrame{
 				btnIngresarParquimetro.setEnabled(false);
 			}
 		});
-		btnIngresarParquimetro.setBounds(324, 12, 200, 25);
+		btnIngresarParquimetro.setBounds(349, 12, 200, 25);
 		getContentPane().add(btnIngresarParquimetro);
 		
 		btnPatente = new JButton("Ingresar");
@@ -316,7 +318,7 @@ public class VenInspector extends JFrame{
 		
 		LP = new DefaultListModel<String>();
 		listaPatente = new JList<String>(LP);
-		listaPatente.setBounds(630, 12, 158, 365);
+		listaPatente.setBounds(604, 16, 158, 365);
 		getContentPane().add(listaPatente);
 		
 		JLabel lblNumero = new JLabel("Numero:");
@@ -328,19 +330,39 @@ public class VenInspector extends JFrame{
 		tfNumero.setBounds(135, 117, 124, 19);
 		getContentPane().add(tfNumero);
 		tfNumero.setColumns(10);
+		
+		JButton btnEliminar = new JButton("Eliminar Patente");
+		btnEliminar.setBounds(621, 407, 124, 23);
+		getContentPane().add(btnEliminar);
+		
+//		JScrollPane scrollPane = new JScrollPane();
+//		scrollPane.setBounds(578, 11, 167, 325);
+//		scrollPane.add(listaPatente);
+//		getContentPane().add(scrollPane);
 
 	}
 
 	private void crearTabla() {
 		// crea la tabla  
 		tabla = new DBTable();
-		tabla.setBounds(35, 250, 500, 300);
+		tabla.setBounds(35, 250, 300, 300);
 
 		// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
 		getContentPane().add(tabla);           
 
 		// setea la tabla para sólo lectura (no se puede editar su contenido)  
 		tabla.setEditable(false);       
+		
+		// crea la tabla  
+		tabla2 = new DBTable();
+		tabla2.setBounds(350, 250, 200, 300);
+
+		// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
+		getContentPane().add(tabla2);           
+
+		// setea la tabla para sólo lectura (no se puede editar su contenido)  
+		tabla2.setEditable(false); 	      
+
 
 	}
 
