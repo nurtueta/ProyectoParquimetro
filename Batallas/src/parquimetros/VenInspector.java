@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -64,6 +65,8 @@ public class VenInspector extends JFrame{
 
 	public void initGUI() {
 		
+		
+		
 		fecha=new Fechas();
 		setBounds(100, 100, 800, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -76,6 +79,8 @@ public class VenInspector extends JFrame{
 
 		getContentPane().setLayout(null);
 		
+		crearTabla();
+		
 		btnIngresarPatente = new JButton("Ingresar Patente");
 		btnIngresarPatente.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -83,9 +88,7 @@ public class VenInspector extends JFrame{
 				tfPatente.setEnabled(true);
 				btnIngresarParquimetro.setEnabled(true);
 				btnIngresarPatente.setEnabled(false);
-				crearTabla();
-				conectarBD();
-							
+				conectarBD();		
 			}
 		});
 		
@@ -129,15 +132,17 @@ public class VenInspector extends JFrame{
 				tfCalle.setEnabled(false);
 				tfNumero.setEnabled(false);
 				tfParquimetro.setEnabled(false);
+				
 				//obtener ubicacion y parquimetro
 				String calle=tfCalle.getText();
 				String parquimetro=tfParquimetro.getText();
 				String numero=tfNumero.getText();
+				
 				//obtener hora y turno de coneccion			
-				//comprobar si se conecta el legajo en su determinado turno
-
 				Statement st = null;
 				ResultSet rs = null;
+				Date fechaMulta;
+				Date horaMulta;
 				try {         				
 					st = (Statement) tabla.getConnection().createStatement();
 					
@@ -184,14 +189,41 @@ public class VenInspector extends JFrame{
 					
 					System.out.print(turno+dia+calle+legajo+numero);
 					
-					rs = st.executeQuery("SELECT * FROM Asociado_con WHERE legajo="+legajo+" AND"+
-					"calle="+calle+" AND altura="+numero+" AND dia="+dia+" AND turno="+turno+";");
-					if(rs.first()) {
-						System.out.println(rs.getString(1));
-					}else
-						System.out.print("no se puede ingresar al turno");
+					//comprobar si se conecta el legajo en su determinado turno
+					int Id=6;
+//					rs = st.executeQuery("SELECT * FROM Asociado_con WHERE legajo="+legajo+" AND"+
+//					" calle="+calle+" AND altura="+numero+" AND dia="+dia+" AND turno="+turno+";");
+//					if(rs.first()) {
+//						System.out.println(rs.getString(1));
+//					}else
+//						System.out.print("no se puede ingresar al turno");
+//					
+					//ingresar acceso
+					System.out.println("llego1");
+					st.executeUpdate("INSERT INTO Accede VALUES("+legajo+","+parquimetro+",CURDATE(),CURTIME());");
+					System.out.println("llego2");
+					//crear multas
+					for(int i=0;i<LP.size();i++) {
+						patente=LP.getElementAt(i);
+						rs=st.executeQuery("SELECT patente FROM estacionados WHERE patente='"+patente+"' AND calle='"+calle+"' AND "
+							+"altura="+numero+";");
+						System.out.println("llego3");
+						if(!rs.first()) {
+							//hacer multa
+							st.executeUpdate("INSERT INTO Multa(fecha,hora,patente,id_asociado_con) VALUES (CURDATE(),"
+									+ "CURTIME(),'"+patente+"',"+Id+");");
+							System.out.println("llego4");
+						}
+						rs.close();
+					}
 					
-					refrescarTabla();      			
+					//mostrar multas
+					txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con ;";
+					refrescarTabla();
+					
+					//vaciar tabla patentes
+					
+//					refrescarTabla();      			
 				} catch (SQLException ex) {
 					salidaError(ex);
 				} catch (NullPointerException ex2){
@@ -216,10 +248,7 @@ public class VenInspector extends JFrame{
 						}
 					}
 				}
-				//crear multas
-				//mostrar multas
 				
-				//vaciar tabla patentes
 			}
 		});
 		btnParquimetro.setEnabled(false);
@@ -276,7 +305,7 @@ public class VenInspector extends JFrame{
 	private void crearTabla() {
 		// crea la tabla  
 		tabla = new DBTable();
-		tabla.setBounds(35, 150, 392, 375);
+		tabla.setBounds(35, 180, 392, 375);
 
 		// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
 		getContentPane().add(tabla);           

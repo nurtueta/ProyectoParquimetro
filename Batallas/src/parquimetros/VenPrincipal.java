@@ -113,7 +113,7 @@ public class VenPrincipal {
 					        if (results.first()) {
 					        	String user= results.getString(1);
 					        	conexionBD.close();
-					           	VenInspector ventanaAdmin = new VenInspector("");
+					           	VenInspector ventanaAdmin = new VenInspector(usuario);
 					           	ventanaAdmin.setVisible(true);
 					           	frame.setVisible(false);
 
