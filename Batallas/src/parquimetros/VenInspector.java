@@ -80,7 +80,7 @@ public class VenInspector extends JFrame{
 				//desconectarBD();
 			}
 		});
-
+		getContentPane().setLayout(null);
 		getContentPane().setLayout(null);
 		
 		btnIngresarPatente = new JButton("Ingresar Patente");
@@ -93,6 +93,22 @@ public class VenInspector extends JFrame{
 				crearTabla();
 				conectarBD();
 							
+			}
+		});
+		
+		
+		JButton btnAtras = new JButton("Menu Principal");
+		btnAtras.setBounds(200, 200, 150, 36);
+		getContentPane().add(btnAtras);
+		
+		btnAtras.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(tabla !=null)
+				desconectarBD();
+				setVisible(false);
+				String [] args = null;
+				VenPrincipal.main(args);;
+				
 			}
 		});
 		
@@ -229,6 +245,9 @@ public class VenInspector extends JFrame{
 				//vaciar tabla patentes
 			}
 		});
+
+		
+		
 		btnParquimetro.setEnabled(false);
 		btnParquimetro.setBounds(324, 102, 114, 25);
 		getContentPane().add(btnParquimetro);

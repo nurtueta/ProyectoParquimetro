@@ -143,11 +143,11 @@ public class VenConsultas extends javax.swing.JFrame
 				pnlConsulta.setLayout(null);
 				{
 					scrConsulta = new JScrollPane();
-					scrConsulta.setBounds(36, 5, 566, 176);
+					scrConsulta.setBounds(60, 5, 566, 176);
 					pnlConsulta.add(scrConsulta);
 					{
 						txtConsulta = new JTextArea();
-						scrConsulta.setViewportView(txtConsulta);
+						scrConsulta.setRowHeaderView(txtConsulta);
 						txtConsulta.setTabSize(3);
 						txtConsulta.setColumns(80);
 						txtConsulta.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
@@ -178,16 +178,22 @@ public class VenConsultas extends javax.swing.JFrame
 								btnNewButton.setBounds(647, 146, 101, 29);
 								pnlConsulta.add(btnNewButton);
 								
-								JLabel label = new JLabel("");
+								JButton btnNewButton_1 = new JButton("Atras");
+								btnNewButton_1.addActionListener(new ActionListener() {
+									public void actionPerformed(ActionEvent arg0) {
+										
+										desconectarBD();
+										setVisible(false);
+										String [] args = null;
+										VenPrincipal.main(args);;
+										
+									}
+								});
+								btnNewButton_1.setBounds(0, 0, 60, 60);
+								pnlConsulta.add(btnNewButton_1);
+								
 
-								
-								
-								
-								label.setBounds(0, 0, 35, 30);
-								pnlConsulta.add(label);
-								
-								btnAtras = new JPanel();
-								btnAtras.setBounds(0, 5, 37, 35);
+
 								
 								
 					botonBorrar.addActionListener(new ActionListener() {
