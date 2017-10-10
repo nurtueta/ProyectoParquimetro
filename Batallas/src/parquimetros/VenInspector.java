@@ -88,6 +88,8 @@ public class VenInspector extends JFrame{
 							
 			}
 		});
+		
+		
 		btnIngresarPatente.setBounds(107, 12, 174, 25);
 		getContentPane().add(btnIngresarPatente);
 		
