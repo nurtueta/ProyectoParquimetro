@@ -24,6 +24,8 @@ import java.awt.event.FocusEvent;
 import java.awt.Toolkit;
 import java.awt.Color;
 import javax.swing.JTextPane;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class VenPrincipal {
 
@@ -149,6 +151,19 @@ public class VenPrincipal {
 		userBox.setColumns(10);
 		
 		pwdBox = new JPasswordField("contrasena");
+		pwdBox.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				
+				
+				
+				
+				/*
+				 * 
+				 * 
+				 */
+			}
+		});
 		pwdBox.setForeground(new Color(153, 153, 102));
 		pwdBox.addFocusListener(new FocusAdapter() {
 			@Override
@@ -178,12 +193,14 @@ public class VenPrincipal {
 		txtpnUsuario.setBackground(new Color(255, 255, 153));
 		txtpnUsuario.setText("Contrasena:");
 		txtpnUsuario.setBounds(10, 133, 64, 20);
+		txtpnUsuario.setFocusable(false);
 		frmParquimetroLandauurtuetavazquez.getContentPane().add(txtpnUsuario);
 		
 		JTextPane textPane = new JTextPane();
 		textPane.setBackground(new Color(255, 255, 153));
 		textPane.setText("Usuario:");
 		textPane.setBounds(18, 84, 46, 20);
+		textPane.setFocusable(false);
 		frmParquimetroLandauurtuetavazquez.getContentPane().add(textPane);
 	}
 	
