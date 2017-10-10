@@ -2,6 +2,7 @@ package parquimetros;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.DefaultListModel;
@@ -26,6 +27,7 @@ import java.sql.Types;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.JList;
+import java.awt.Color;
 
 public class VenInspector extends JFrame{
 
@@ -56,6 +58,7 @@ public class VenInspector extends JFrame{
 	public VenInspector(String u) 
 	{
 		super();
+		getContentPane().setBackground(new Color(204, 255, 153));
 		this.legajo = u;
 		initGUI();
 	}
@@ -70,13 +73,17 @@ public class VenInspector extends JFrame{
 		fecha=new Fechas();
 		setBounds(100, 100, 800, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		setTitle("Parquimetro Landau-Urtueta-Vazquez");
+		setIconImage(Toolkit.getDefaultToolkit().getImage(VenPrincipal.class.getResource("/imagenes/logoParquimetro.jpg")));
+
 		setVisible(true);
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				//desconectarBD();
 			}
 		});
-
+		getContentPane().setLayout(null);
 		getContentPane().setLayout(null);
 		
 		crearTabla();
@@ -89,6 +96,22 @@ public class VenInspector extends JFrame{
 				btnIngresarParquimetro.setEnabled(true);
 				btnIngresarPatente.setEnabled(false);
 				conectarBD();		
+			}
+		});
+		
+		
+		JButton btnAtras = new JButton("Menu Principal");
+		btnAtras.setBounds(200, 200, 150, 36);
+		getContentPane().add(btnAtras);
+		
+		btnAtras.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(tabla !=null)
+				desconectarBD();
+				setVisible(false);
+				String [] args = null;
+				VenPrincipal.main(args);;
+				
 			}
 		});
 		
@@ -251,6 +274,9 @@ public class VenInspector extends JFrame{
 				
 			}
 		});
+
+		
+		
 		btnParquimetro.setEnabled(false);
 		btnParquimetro.setBounds(324, 102, 114, 25);
 		getContentPane().add(btnParquimetro);

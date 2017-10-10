@@ -1,14 +1,21 @@
 package parquimetros;
 
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.sql.Types;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -27,7 +34,10 @@ import com.mysql.jdbc.Statement;
 import quick.dbtable.*;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent; 
+import javax.swing.event.ListSelectionEvent;
+import java.awt.Color;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon; 
 
 @SuppressWarnings("serial")
 public class VenConsultas extends javax.swing.JFrame 
@@ -47,11 +57,13 @@ public class VenConsultas extends javax.swing.JFrame
 	private String usuario;
 	private String clave;
 	private JButton btnNewButton;
+	private JPanel btnAtras;
 
 
 	public VenConsultas() 
 	{
 		super();
+		getContentPane().setBackground(new Color(255, 153, 102));
 		usuario = "admin";
 		clave = "admin";
 		initGUI();
@@ -65,6 +77,10 @@ public class VenConsultas extends javax.swing.JFrame
 			setVisible(true);
 			this.setTitle("Consultas");
 			this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+			this.setTitle("Parquimetro Landau-Urtueta-Vazquez");
+			setIconImage(Toolkit.getDefaultToolkit().getImage(VenPrincipal.class.getResource("/imagenes/logoParquimetro.jpg")));
+
 			this.addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
 					desconectarBD();
@@ -121,16 +137,17 @@ public class VenConsultas extends javax.swing.JFrame
 			}
 			{
 				pnlConsulta = new JPanel();
+				pnlConsulta.setBackground(new Color(255, 153, 102));
 				pnlConsulta.setBounds(0, 0, 784, 186);
 				getContentPane().add(pnlConsulta);
 				pnlConsulta.setLayout(null);
 				{
 					scrConsulta = new JScrollPane();
-					scrConsulta.setBounds(36, 5, 566, 176);
+					scrConsulta.setBounds(60, 5, 566, 176);
 					pnlConsulta.add(scrConsulta);
 					{
 						txtConsulta = new JTextArea();
-						scrConsulta.setViewportView(txtConsulta);
+						scrConsulta.setRowHeaderView(txtConsulta);
 						txtConsulta.setTabSize(3);
 						txtConsulta.setColumns(80);
 						txtConsulta.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
@@ -160,12 +177,25 @@ public class VenConsultas extends javax.swing.JFrame
 								btnNewButton = new JButton("Reconectar");
 								btnNewButton.setBounds(647, 146, 101, 29);
 								pnlConsulta.add(btnNewButton);
-								btnNewButton.addActionListener(new ActionListener() {
-									public void actionPerformed(ActionEvent e) {
+								
+								JButton btnNewButton_1 = new JButton("Atras");
+								btnNewButton_1.addActionListener(new ActionListener() {
+									public void actionPerformed(ActionEvent arg0) {
+										
 										desconectarBD();
-										conectarBD();
+										setVisible(false);
+										String [] args = null;
+										VenPrincipal.main(args);;
+										
 									}
 								});
+								btnNewButton_1.setBounds(0, 0, 60, 60);
+								pnlConsulta.add(btnNewButton_1);
+								
+
+
+								
+								
 					botonBorrar.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0) {
 							txtConsulta.setText("");            			
@@ -176,6 +206,8 @@ public class VenConsultas extends javax.swing.JFrame
 			{
 				// crea la tabla  
 				tabla = new DBTable();
+				tabla.setBackground(new Color(255, 153, 102));
+				tabla.getTable().setBackground(new Color(204, 255, 204));
 				tabla.setBounds(0, 186, 392, 375);
 
 				// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
@@ -367,7 +399,4 @@ public class VenConsultas extends javax.swing.JFrame
 		}
 
 	}
-
-
-
 }

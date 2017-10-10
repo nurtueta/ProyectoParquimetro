@@ -21,10 +21,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.Toolkit;
+import java.awt.Color;
+import javax.swing.JTextPane;
 
 public class VenPrincipal {
 
-	private JFrame frame;
+	private JFrame frmParquimetroLandauurtuetavazquez;
 	private JTextField userBox;
 	private JPasswordField pwdBox;
 	protected Connection conexionBD = null;
@@ -39,7 +42,7 @@ public class VenPrincipal {
 			public void run() {
 				try {
 					VenPrincipal window = new VenPrincipal();
-					window.frame.setVisible(true);
+					window.frmParquimetroLandauurtuetavazquez.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -58,8 +61,12 @@ public class VenPrincipal {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.addWindowListener(new WindowAdapter() {
+		frmParquimetroLandauurtuetavazquez = new JFrame();
+		frmParquimetroLandauurtuetavazquez.getContentPane().setBackground(new Color(255, 255, 153));
+		frmParquimetroLandauurtuetavazquez.setBackground(new Color(255, 255, 153));
+		frmParquimetroLandauurtuetavazquez.setTitle("Parquimetro Landau-Urtueta-Vazquez");
+		frmParquimetroLandauurtuetavazquez.setIconImage(Toolkit.getDefaultToolkit().getImage(VenPrincipal.class.getResource("/imagenes/logoParquimetro.jpg")));
+		frmParquimetroLandauurtuetavazquez.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent arg0) {
 				
@@ -72,9 +79,9 @@ public class VenPrincipal {
 				}
 			}
 		});
-		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		frmParquimetroLandauurtuetavazquez.setBounds(100, 100, 450, 300);
+		frmParquimetroLandauurtuetavazquez.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmParquimetroLandauurtuetavazquez.getContentPane().setLayout(null);
 		
 		JButton btnLogin = new JButton("Login");
 		btnLogin.addActionListener(new ActionListener() {
@@ -97,7 +104,7 @@ public class VenPrincipal {
 							
 						VenConsultas ventanaAdmin = new VenConsultas();
 						ventanaAdmin.setVisible(true);
-						frame.setVisible(false);
+						frmParquimetroLandauurtuetavazquez.setVisible(false);
 
 					}
 					/*
@@ -113,9 +120,15 @@ public class VenPrincipal {
 					        if (results.first()) {
 					        	String user= results.getString(1);
 					        	conexionBD.close();
+<<<<<<< HEAD
 					           	VenInspector ventanaAdmin = new VenInspector(usuario);
 					           	ventanaAdmin.setVisible(true);
 					           	frame.setVisible(false);
+=======
+					           	VenInspector ventanaInspector = new VenInspector("");
+					           	ventanaInspector.setVisible(true);
+					           	frmParquimetroLandauurtuetavazquez.setVisible(false);
+>>>>>>> 82ce70bc0ae090d224fa867c3c1c6e0bfaab6498
 
 					        }
 					        else {
@@ -131,15 +144,17 @@ public class VenPrincipal {
 		    } 
 		});
 		btnLogin.setBounds(261, 109, 89, 23);
-		frame.getContentPane().add(btnLogin);
+		frmParquimetroLandauurtuetavazquez.getContentPane().add(btnLogin);
 		
 		userBox = new JTextField();
+		userBox.setForeground(new Color(153, 153, 102));
 		userBox.setText("Usuario");
-		userBox.setBounds(74, 84, 86, 20);
-		frame.getContentPane().add(userBox);
+		userBox.setBounds(82, 84, 86, 20);
+		frmParquimetroLandauurtuetavazquez.getContentPane().add(userBox);
 		userBox.setColumns(10);
 		
 		pwdBox = new JPasswordField("contrasena");
+		pwdBox.setForeground(new Color(153, 153, 102));
 		pwdBox.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent arg0) {
@@ -160,9 +175,21 @@ public class VenPrincipal {
 		
 		pwdBox.setEchoChar('*');
 		pwdBox.setToolTipText("Contrase\u00F1a");
-		pwdBox.setBounds(74, 133, 86, 20);
-		frame.getContentPane().add(pwdBox);
+		pwdBox.setBounds(82, 133, 86, 20);
+		frmParquimetroLandauurtuetavazquez.getContentPane().add(pwdBox);
 		pwdBox.setColumns(10);
+		
+		JTextPane txtpnUsuario = new JTextPane();
+		txtpnUsuario.setBackground(new Color(255, 255, 153));
+		txtpnUsuario.setText("Contrasena:");
+		txtpnUsuario.setBounds(10, 133, 64, 20);
+		frmParquimetroLandauurtuetavazquez.getContentPane().add(txtpnUsuario);
+		
+		JTextPane textPane = new JTextPane();
+		textPane.setBackground(new Color(255, 255, 153));
+		textPane.setText("Usuario:");
+		textPane.setBounds(18, 84, 46, 20);
+		frmParquimetroLandauurtuetavazquez.getContentPane().add(textPane);
 	}
 	
 	
