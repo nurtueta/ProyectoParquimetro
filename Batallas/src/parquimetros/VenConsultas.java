@@ -7,10 +7,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.sql.Types;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -30,7 +35,9 @@ import quick.dbtable.*;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
-import java.awt.Color; 
+import java.awt.Color;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon; 
 
 @SuppressWarnings("serial")
 public class VenConsultas extends javax.swing.JFrame 
@@ -171,18 +178,18 @@ public class VenConsultas extends javax.swing.JFrame
 								btnNewButton.setBounds(647, 146, 101, 29);
 								pnlConsulta.add(btnNewButton);
 								
+								JLabel label = new JLabel("");
+
+								
+								
+								
+								label.setBounds(0, 0, 35, 30);
+								pnlConsulta.add(label);
+								
 								btnAtras = new JPanel();
 								btnAtras.setBounds(0, 5, 37, 35);
 								
-								/*pnlConsulta.add(btnAtras);
-								Image background = Toolkit.getDefaultToolkit().createImage("Background.png");
-							    btnAtras.drawImage(background, 0, 0, null);
-								btnNewButton.addActionListener(new ActionListener() {
-									public void actionPerformed(ActionEvent e) {
-										desconectarBD();
-										conectarBD();
-									}
-								});*/
+								
 					botonBorrar.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0) {
 							txtConsulta.setText("");            			
@@ -386,7 +393,4 @@ public class VenConsultas extends javax.swing.JFrame
 		}
 
 	}
-
-
-
 }
