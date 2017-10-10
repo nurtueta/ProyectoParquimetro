@@ -23,6 +23,7 @@ import java.awt.event.WindowEvent;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.sql.Types;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
@@ -200,6 +201,7 @@ public class VenInspector extends JFrame{
 					String turno=null;
 					rs=st.executeQuery("SELECT CURTIME();");
 					rs.first();
+					Time horaDate=rs.getTime(1);
 					int hora=Integer.parseInt(rs.getString(1).substring(0,2));
 					if((hora<=8) && hora<14)
 						turno="M";
@@ -210,38 +212,37 @@ public class VenInspector extends JFrame{
 							turno="T";//aca va mensaje diciendo que no se puede conectar en su turno
 					rs.close();
 					
-					System.out.print(turno+dia+calle+legajo+numero);
-					
 					//comprobar si se conecta el legajo en su determinado turno
 					int Id=6;
-//					rs = st.executeQuery("SELECT * FROM Asociado_con WHERE legajo="+legajo+" AND"+
-//					" calle="+calle+" AND altura="+numero+" AND dia="+dia+" AND turno="+turno+";");
-//					if(rs.first()) {
-//						System.out.println(rs.getString(1));
-//					}else
-//						System.out.print("no se puede ingresar al turno");
-//					
+					rs = st.executeQuery("SELECT id_asociado_con FROM Asociado_con WHERE legajo="+legajo+" AND"+
+					" calle='"+calle+"' AND altura="+numero+" AND dia='"+dia+"' AND turno='"+turno+"';");
+					if(rs.first()) {
+						Id=Integer.parseInt(rs.getString(1));
+					}else
+						System.out.print("no se puede ingresar al turno");
+					
+					System.out.println(""+horaDate.toString());
 					//ingresar acceso
-					System.out.println("llego1");
+					String horah=horaDate.toString();
 					st.executeUpdate("INSERT INTO Accede VALUES("+legajo+","+parquimetro+",CURDATE(),CURTIME());");
-					System.out.println("llego2");
+					
+					System.out.println(""+horaDate.toString());
 					//crear multas
 					for(int i=0;i<LP.size();i++) {
 						patente=LP.getElementAt(i);
 						rs=st.executeQuery("SELECT patente FROM estacionados WHERE patente='"+patente+"' AND calle='"+calle+"' AND "
 							+"altura="+numero+";");
-						System.out.println("llego3");
 						if(!rs.first()) {
 							//hacer multa
 							st.executeUpdate("INSERT INTO Multa(fecha,hora,patente,id_asociado_con) VALUES (CURDATE(),"
 									+ "CURTIME(),'"+patente+"',"+Id+");");
-							System.out.println("llego4");
 						}
 						rs.close();
 					}
+					LP.removeAllElements();
 					
 					//mostrar multas
-					txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con ;";
+					txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con WHERE ;";
 					refrescarTabla();
 					
 					//vaciar tabla patentes

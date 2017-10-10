@@ -120,15 +120,10 @@ public class VenPrincipal {
 					        if (results.first()) {
 					        	String user= results.getString(1);
 					        	conexionBD.close();
-<<<<<<< HEAD
-					           	VenInspector ventanaAdmin = new VenInspector(usuario);
-					           	ventanaAdmin.setVisible(true);
-					           	frame.setVisible(false);
-=======
-					           	VenInspector ventanaInspector = new VenInspector("");
+					        	
+					           	VenInspector ventanaInspector = new VenInspector(usuario);
 					           	ventanaInspector.setVisible(true);
 					           	frmParquimetroLandauurtuetavazquez.setVisible(false);
->>>>>>> 82ce70bc0ae090d224fa867c3c1c6e0bfaab6498
 
 					        }
 					        else {
