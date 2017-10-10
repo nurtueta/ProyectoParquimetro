@@ -23,10 +23,8 @@ import java.awt.event.WindowEvent;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Types;
 import java.awt.event.ActionEvent;
-import javax.swing.JTable;
 import javax.swing.JList;
 import java.awt.Color;
 import javax.swing.JScrollPane;
@@ -39,6 +37,7 @@ public class VenInspector extends JFrame{
 	private JButton btnIngresarParquimetro;
 	private JButton btnPatente;
 	private JButton btnParquimetro;
+	private JButton btnEliminar;
 	private JTextField tfPatente;
 	private JTextField tfCalle;
 	private JTextField tfParquimetro;
@@ -49,9 +48,7 @@ public class VenInspector extends JFrame{
 	private DefaultListModel<String> LP;
 	
 	private DBTable tabla;
-	private DBTable tabla2;
 	private String legajo;
-	private String clave;
 	private String txtConsulta;
 	private String patente;
 	private JTextField tfNumero;
@@ -142,8 +139,22 @@ public class VenInspector extends JFrame{
 		btnPatente.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				patente=tfPatente.getText();
-				LP.addElement(patente);
-				//permitir eliminar patentes
+				//compruebo que la patente exista
+				try {
+					Statement st = (Statement) tabla.getConnection().createStatement();
+					ResultSet rs=st.executeQuery("SELECT patente FROM Automoviles WHERE patente='"+patente+"';");
+					if(rs.first())
+						LP.addElement(patente);
+					else
+						JOptionPane.showMessageDialog(null,
+								"La patente "+patente+" no existe",
+								"Ingreso invalido",
+								JOptionPane.ERROR_MESSAGE);
+						
+				} catch (SQLException ex) {
+					salidaError(ex);;
+				}
+
 			}
 		});
 		btnPatente.setEnabled(false);
@@ -331,8 +342,14 @@ public class VenInspector extends JFrame{
 		getContentPane().add(tfNumero);
 		tfNumero.setColumns(10);
 		
-		JButton btnEliminar = new JButton("Eliminar Patente");
+		btnEliminar = new JButton("Eliminar Patente");
 		btnEliminar.setBounds(621, 407, 124, 23);
+		btnEliminar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(!listaPatente.isSelectionEmpty())
+					LP.remove(listaPatente.getSelectedIndex());
+			}
+		});
 		getContentPane().add(btnEliminar);
 		
 //		JScrollPane scrollPane = new JScrollPane();
@@ -345,24 +362,13 @@ public class VenInspector extends JFrame{
 	private void crearTabla() {
 		// crea la tabla  
 		tabla = new DBTable();
-		tabla.setBounds(35, 250, 300, 300);
+		tabla.setBounds(35, 250, 500, 300);
 
 		// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
 		getContentPane().add(tabla);           
 
 		// setea la tabla para sólo lectura (no se puede editar su contenido)  
 		tabla.setEditable(false);       
-		
-		// crea la tabla  
-		tabla2 = new DBTable();
-		tabla2.setBounds(350, 250, 200, 300);
-
-		// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
-		getContentPane().add(tabla2);           
-
-		// setea la tabla para sólo lectura (no se puede editar su contenido)  
-		tabla2.setEditable(false); 	      
-
 
 	}
 
