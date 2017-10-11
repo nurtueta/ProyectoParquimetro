@@ -1,7 +1,5 @@
 package parquimetros;
 
-import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
@@ -20,7 +18,6 @@ import javax.swing.JOptionPane;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -29,36 +26,37 @@ import javax.swing.JList;
 import java.awt.Color;
 import javax.swing.JScrollPane;
 
+@SuppressWarnings("serial")
 public class VenInspector extends JFrame{
-
-	private JFrame frame;
 
 	private JButton btnIngresarPatente;
 	private JButton btnIngresarParquimetro;
 	private JButton btnPatente;
 	private JButton btnParquimetro;
 	private JButton btnEliminar;
+	private JButton btnCancelar;
+	private JButton btnAtras;
+	
 	private JTextField tfPatente;
 	private JTextField tfCalle;
 	private JTextField tfParquimetro;
+	private JTextField tfNumero;
+	
 	private JLabel lblPatente;
 	private JLabel lblCalle;
 	private JLabel lblParquimetro;
+	private JLabel lblNumero;
+	
 	private JList<String> listaPatente;
-	private JList<String> list;
 	private DefaultListModel<String> LP;
-	private DefaultListModel<String> LU;
 	
 	private DBTable tabla;
+	
 	private String legajo;
 	private String txtConsulta;
 	private String patente;
-	private JTextField tfNumero;
-	private JScrollPane scrollPane;
-	private JScrollPane scrollPane2;
-	private JLabel lblNumero;
 	
-	private Fechas fecha;
+	private JScrollPane scrollPane;
 	
 	public VenInspector(String u) 
 	{
@@ -73,9 +71,6 @@ public class VenInspector extends JFrame{
 
 	public void initGUI() {
 		
-		
-		
-		fecha=new Fechas();
 		setBounds(100, 100, 800, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -85,10 +80,9 @@ public class VenInspector extends JFrame{
 		setVisible(true);
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				//desconectarBD();
+				desconectarBD();
 			}
 		});
-		getContentPane().setLayout(null);
 		getContentPane().setLayout(null);
 		
 		crearTabla();
@@ -96,6 +90,7 @@ public class VenInspector extends JFrame{
 		btnIngresarPatente = new JButton("Ingresar Patente");
 		btnIngresarPatente.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				//conecto a la BD y habilito las operaciones siguientes
 				btnPatente.setEnabled(true);
 				tfPatente.setEnabled(true);
 				btnIngresarParquimetro.setEnabled(true);
@@ -103,26 +98,22 @@ public class VenInspector extends JFrame{
 				conectarBD();		
 			}
 		});
+		btnIngresarPatente.setBounds(144, 12, 174, 25);
+		getContentPane().add(btnIngresarPatente);
 		
-		
-		JButton btnAtras = new JButton("Menu Principal");
+		//vuelvo al menu principal
+		btnAtras = new JButton("Menu Principal");
 		btnAtras.setBounds(10, 12, 114, 25);
 		getContentPane().add(btnAtras);
-		
 		btnAtras.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(tabla !=null)
 				desconectarBD();
 				setVisible(false);
 				String [] args = null;
-				VenPrincipal.main(args);;
-				
+				VenPrincipal.main(args);;	
 			}
 		});
-		
-		
-		btnIngresarPatente.setBounds(144, 12, 174, 25);
-		getContentPane().add(btnIngresarPatente);
 		
 		btnIngresarParquimetro = new JButton("Ingresar Parquimetro");
 		btnIngresarParquimetro.setEnabled(false);
@@ -134,8 +125,7 @@ public class VenInspector extends JFrame{
 				tfParquimetro.setEnabled(true);
 				tfCalle.setEnabled(true);
 				tfNumero.setEnabled(true);
-				btnIngresarParquimetro.setEnabled(false);
-				
+				btnIngresarParquimetro.setEnabled(false);	
 			}
 		});
 		btnIngresarParquimetro.setBounds(349, 12, 200, 25);
@@ -149,6 +139,7 @@ public class VenInspector extends JFrame{
 				try {
 					Statement st = (Statement) tabla.getConnection().createStatement();
 					ResultSet rs=st.executeQuery("SELECT patente FROM Automoviles WHERE patente='"+patente+"';");
+					//si existe la ingreso a la lista, sino muestro mensaje
 					if(rs.first())
 						LP.addElement(patente);
 					else
@@ -160,6 +151,7 @@ public class VenInspector extends JFrame{
 				} catch (SQLException ex) {
 					salidaError(ex);;
 				}
+				tfPatente.setText("");
 			}
 		});
 		btnPatente.setEnabled(false);
@@ -168,19 +160,12 @@ public class VenInspector extends JFrame{
 		
 		btnParquimetro = new JButton("Ingresar");
 		btnParquimetro.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				btnIngresarPatente.setEnabled(true);
-				btnParquimetro.setEnabled(false);
-				tfCalle.setEnabled(false);
-				tfNumero.setEnabled(false);
-				tfParquimetro.setEnabled(false);
-				
-				//obtener ubicacion y parquimetro
+			public void actionPerformed(ActionEvent arg0) {				
+				//obtener ubicacion y numero de parquimetro
 				String calle=tfCalle.getText();
 				String parquimetro=tfParquimetro.getText();
 				String numero=tfNumero.getText();
-				
-				//obtener hora y turno de coneccion			
+						
 				Statement st = null;
 				ResultSet rs = null;
 				try {         				
@@ -223,48 +208,84 @@ public class VenInspector extends JFrame{
 					else
 						if(hora>=14 && hora<19)
 							turno="T";
-						else
-							turno="T";//aca va mensaje diciendo que no se puede conectar en su turno
-//							JOptionPane.showMessageDialog(null,
-//									"Esta fuera del horario de trabajo",
-//									"Ingreso invalido",
-//									JOptionPane.ERROR_MESSAGE);
+						else {
+							//cancelo todo porque esta fuera de horario
+							btnIngresarPatente.setEnabled(true);
+							btnParquimetro.setEnabled(false);
+							tfCalle.setEnabled(false);
+							tfNumero.setEnabled(false);
+							tfParquimetro.setEnabled(false);
+							limpiarTexto();
+							JOptionPane.showMessageDialog(null,
+									"Esta fuera del horario de trabajo",
+									"Ingreso invalido",
+									JOptionPane.ERROR_MESSAGE);
+						}
 					rs.close();
 					
 					//comprobar si se conecta el legajo en su determinado turno
-					int Id=6;
+					int Id;
 					rs = st.executeQuery("SELECT id_asociado_con FROM Asociado_con WHERE legajo="+legajo+" AND"+
 					" calle='"+calle+"' AND altura="+numero+" AND dia='"+dia+"' AND turno='"+turno+"';");
 					if(rs.first()) {
+						//se conecto en su determinado turno
 						Id=Integer.parseInt(rs.getString(1));
-						//ingresar acceso
-						st.executeUpdate("INSERT INTO Accede VALUES("+legajo+","+parquimetro+",CURDATE(),CURTIME());");
+						rs.close();
 						
-						//crear multas
-						for(int i=0;i<LP.size();i++) {
-							patente=LP.getElementAt(i);
-							rs=st.executeQuery("SELECT patente FROM estacionados WHERE patente='"+patente+"' AND calle='"+calle+"' AND "
-								+"altura="+numero+";");
-							if(!rs.first()) {
-								//hacer multa
-								st.executeUpdate("INSERT INTO Multa(fecha,hora,patente,id_asociado_con) VALUES (CURDATE(),"
-										+ "CURTIME(),'"+patente+"',"+Id+");");
-							}
+						//obtengo id_parq y verifico que los datos de parquimetro sean correctos
+						rs = st.executeQuery("SELECT id_parq FROM Parquimetros WHERE numero="+parquimetro+" AND"+
+								" calle='"+calle+"' AND altura="+numero+" ;");
+						if(rs.first()) {
+							//datos de parquimetros correctos
+							parquimetro=rs.getString(1);
 							rs.close();
-						}
-						LP.removeAllElements();
-						
-						//mostrar multas
-						txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con "+
-								"WHERE calle='"+calle+"' AND altura="+numero+" AND legajo="+legajo+
-								" AND fecha=CURDATE();";
-						refrescarTabla();
+							
+							//ingresar acceso
+							st.executeUpdate("INSERT INTO Accede VALUES("+legajo+","+parquimetro+",CURDATE(),CURTIME());");
+							
+							//crear multas
+							for(int i=0;i<LP.size();i++) {
+								patente=LP.getElementAt(i);
+								//si la patente no esta en estacionados entonces hago una multa
+								rs=st.executeQuery("SELECT patente FROM estacionados WHERE patente='"+patente+"' AND calle='"+calle+"' AND "
+									+"altura="+numero+";");
+								if(!rs.first()) {
+									//hacer multa
+									st.executeUpdate("INSERT INTO Multa(fecha,hora,patente,id_asociado_con) VALUES (CURDATE(),"
+											+ "CURTIME(),'"+patente+"',"+Id+");");
+								}
+								rs.close();
+							}
+							LP.removeAllElements();
+							
+							//mostrar multas
+							txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con "+
+									"WHERE calle='"+calle+"' AND altura="+numero+" AND legajo="+legajo+
+									" AND fecha=CURDATE();";
+							refrescarTabla();
+							
+							//seteo todo para volver a empezar
+							btnIngresarPatente.setEnabled(true);
+							btnParquimetro.setEnabled(false);
+							tfCalle.setEnabled(false);
+							tfNumero.setEnabled(false);
+							tfParquimetro.setEnabled(false);
+							limpiarTexto();
 					
-					}else
+						}else {
+							JOptionPane.showMessageDialog(null,
+									"Parquimetro ingresado invalido",
+									"Ingreso invalido",
+									JOptionPane.ERROR_MESSAGE);
+							limpiarTexto();
+						}
+					}else {
 						JOptionPane.showMessageDialog(null,
 								"No puede ingresar al parquimetro en este turno",
 								"Ingreso invalido",
 								JOptionPane.ERROR_MESSAGE);
+						limpiarTexto();
+					}
 				
 				} catch (SQLException ex) {
 					salidaError(ex);
@@ -293,10 +314,26 @@ public class VenInspector extends JFrame{
 				
 			}
 		});
-		
 		btnParquimetro.setEnabled(false);
 		btnParquimetro.setBounds(324, 102, 114, 25);
 		getContentPane().add(btnParquimetro);
+		
+		btnCancelar = new JButton("Cancelar");
+		btnCancelar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//vuelvo a empezar
+				btnIngresarPatente.setEnabled(true);
+				btnParquimetro.setEnabled(false);
+				tfCalle.setEnabled(false);
+				tfNumero.setEnabled(false);
+				tfParquimetro.setEnabled(false);
+				LP.removeAllElements();
+				tabla.cleanup();
+				limpiarTexto();
+			}
+		});
+		btnCancelar.setBounds(324, 140, 114, 25);
+		getContentPane().add(btnCancelar);
 		
 		tfPatente = new JTextField();
 		tfPatente.setEnabled(false);
@@ -357,6 +394,12 @@ public class VenInspector extends JFrame{
 		getContentPane().add(btnEliminar);
 	}
 
+	private void limpiarTexto() {
+		tfNumero.setText("");
+		tfCalle.setText("");
+		tfParquimetro.setText("");
+	}
+	
 	private void crearTabla() {
 		tabla = new DBTable();
 		tabla.setBounds(35, 250, 500, 300);
