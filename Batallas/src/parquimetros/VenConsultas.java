@@ -359,6 +359,9 @@ public class VenConsultas extends javax.swing.JFrame
 	{
 		try
 		{    
+			/**
+			 * Si el comando modifica la tabla, ingresa aqui
+			 */
 			String comando = new String(txtConsulta.getText());
 			if(txtConsulta.getText(0, 6).toLowerCase().equals("insert")||
 					txtConsulta.getText(0, 6).toLowerCase().equals("delete")||
@@ -369,6 +372,10 @@ public class VenConsultas extends javax.swing.JFrame
 				st.close();
 			}
 			else {
+				
+				/*
+				 * Si el comando es de consulta para la tabla, ingresa aqui.
+				 */
 				// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
 				tabla.setSelectSql(this.txtConsulta.getText().trim());
 				
