@@ -34,6 +34,7 @@ import com.mysql.jdbc.Statement;
 import quick.dbtable.*;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -358,26 +359,35 @@ public class VenConsultas extends javax.swing.JFrame
 	{
 		try
 		{    
-		
-			
-			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
-			tabla.setSelectSql(this.txtConsulta.getText().trim());
-
-			// obtenemos el modelo de la tabla a partir de la consulta para 
-			// modificar la forma en que se muestran de algunas columnas  
-			tabla.createColumnModelFromQuery();    	    
-			for (int i = 0; i < tabla.getColumnCount(); i++)
-			{ // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-				if	 (tabla.getColumn(i).getType()==Types.TIME)  
-				{    		 
-					tabla.getColumn(i).setType(Types.CHAR);  
-				}
-				// cambiar el formato en que se muestran los valores de tipo DATE
-				if	 (tabla.getColumn(i).getType()==Types.DATE)
-				{
-					tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
-				}
-			}  
+			String comando = new String(txtConsulta.getText());
+			if(txtConsulta.getText(0, 6).toLowerCase().equals("insert")||
+					txtConsulta.getText(0, 6).toLowerCase().equals("delete")||
+					txtConsulta.getText(0, 6).toLowerCase().equals("update")){
+				System.out.printf("\n \n \n"+comando + "esto es lo que estooy imprimiendo \n \n \n");
+				Statement st = (Statement) tabla.getConnection().createStatement();
+				st.executeUpdate(comando.trim());
+				st.close();
+			}
+			else {
+				// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
+				tabla.setSelectSql(this.txtConsulta.getText().trim());
+				
+				// obtenemos el modelo de la tabla a partir de la consulta para 
+				// modificar la forma en que se muestran de algunas columnas  
+				tabla.createColumnModelFromQuery();    	    
+				for (int i = 0; i < tabla.getColumnCount(); i++)
+				{ // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
+					if	 (tabla.getColumn(i).getType()==Types.TIME)  
+					{    		 
+						tabla.getColumn(i).setType(Types.CHAR);  
+					}
+					// cambiar el formato en que se muestran los valores de tipo DATE
+					if	 (tabla.getColumn(i).getType()==Types.DATE)
+					{
+						tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
+					}
+				}  
+			}
 			// actualizamos el contenido de la tabla.   	     	  
 			tabla.refresh();
 			// No es necesario establecer  una conexión, crear una sentencia y recuperar el 
@@ -398,6 +408,9 @@ public class VenConsultas extends javax.swing.JFrame
 					"Error al ejecutar la consulta.",
 					JOptionPane.ERROR_MESSAGE);
 
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}
