@@ -45,7 +45,9 @@ public class VenInspector extends JFrame{
 	private JLabel lblCalle;
 	private JLabel lblParquimetro;
 	private JList<String> listaPatente;
+	private JList<String> list;
 	private DefaultListModel<String> LP;
+	private DefaultListModel<String> LU;
 	
 	private DBTable tabla;
 	private String legajo;
@@ -53,6 +55,7 @@ public class VenInspector extends JFrame{
 	private String patente;
 	private JTextField tfNumero;
 	private JScrollPane scrollPane;
+	private JScrollPane scrollPane2;
 	private JLabel lblNumero;
 	
 	private Fechas fecha;
@@ -132,6 +135,7 @@ public class VenInspector extends JFrame{
 				tfCalle.setEnabled(true);
 				tfNumero.setEnabled(true);
 				btnIngresarParquimetro.setEnabled(false);
+				
 			}
 		});
 		btnIngresarParquimetro.setBounds(349, 12, 200, 25);
@@ -156,7 +160,6 @@ public class VenInspector extends JFrame{
 				} catch (SQLException ex) {
 					salidaError(ex);;
 				}
-
 			}
 		});
 		btnPatente.setEnabled(false);
@@ -352,7 +355,6 @@ public class VenInspector extends JFrame{
 			}
 		});
 		getContentPane().add(btnEliminar);
-
 	}
 
 	private void crearTabla() {
