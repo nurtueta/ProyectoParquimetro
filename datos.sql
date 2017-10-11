@@ -93,6 +93,7 @@ INSERT INTO Asociado_con(legajo, calle, altura, dia, turno) VALUES (3222, 'c1', 
 INSERT INTO Asociado_con(legajo, calle, altura, dia, turno) VALUES (3333, 'c4', 15, 'Ma', 'T');
 INSERT INTO Asociado_con(legajo, calle, altura, dia, turno) VALUES (3111, 'c2', 5, 'Ju', 'T');
 INSERT INTO Asociado_con(legajo, calle, altura, dia, turno) VALUES (3555, 'c4', 15, 'Mi', 'T');
+INSERT INTO Asociado_con(legajo, calle, altura, dia, turno) VALUES (3666, 'c2', 5, 'Mi', 'T');
 
 INSERT INTO Multa VALUES (611111, '2017-9-11', '07:04:21', 'AAAAAA',1);
 INSERT INTO Multa VALUES (622222, '2017-9-11', '08:05:12', 'BBBBBB',1);

@@ -200,18 +200,20 @@ CREATE TABLE Multa (
 	GRANT CREATE USER ON *.* TO admin@localhost;
 
 	CREATE USER venta@'%' IDENTIFIED BY 'venta';	
-    GRANT INSERT ON parquimetros.Tarjetas TO venta@'%';
+    	GRANT INSERT ON parquimetros.Tarjetas TO venta@'%';
 	GRANT SELECT ON parquimetros.Automoviles To venta@'%';
 	GRANT SELECT ON parquimetros.Tipos_tarjeta To venta@'%';
 	GRANT SELECT ON parquimetros.Tarjetas To venta@'%';
 	
 	CREATE USER inspector@'%' IDENTIFIED BY 'inspector';	
 	GRANT SELECT ON parquimetros.Inspectores TO inspector@'%';	
-	GRANT SELECT ON parquimetros.estacionados TO inspector@'%';	
-	GRANT INSERT ON parquimetros.Multa TO inspector@'%';	
-	GRANT INSERT ON parquimetros.Accede TO inspector@'%';
+	GRANT SELECT ON parquimetros.estacionados TO inspector@'%';
 	GRANT SELECT ON parquimetros.Multa TO inspector@'%';
 	GRANT SELECT ON parquimetros.Accede TO inspector@'%';
 	GRANT SELECT ON parquimetros.Parquimetros TO inspector@'%';
+	GRANT SELECT ON parquimetros.Asociado_con TO inspector@'%';
+	GRANT SELECT ON parquimetros.Automoviles TO inspector@'%';
+	GRANT INSERT ON parquimetros.Multa TO inspector@'%';	
+	GRANT INSERT ON parquimetros.Accede TO inspector@'%';
 #-------------------------------------------------------------------------
 #fin
