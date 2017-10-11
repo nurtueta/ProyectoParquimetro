@@ -355,19 +355,6 @@ public class VenInspector extends JFrame{
 			}
 		});
 		getContentPane().add(btnEliminar);
-<<<<<<< HEAD
-=======
-		
-		JList list = new JList();
-		list.setBounds(531, 172, -73, -69);
-		getContentPane().add(list);
-		
-//		JScrollPane scrollPane = new JScrollPane();
-//		scrollPane.setBounds(578, 11, 167, 325);
-//		scrollPane.add(listaPatente);
-//		getContentPane().add(scrollPane);
-
->>>>>>> 00cf17ba3a139b674192ebf155009c432953d903
 	}
 
 	private void crearTabla() {
