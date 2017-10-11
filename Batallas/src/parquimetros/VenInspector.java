@@ -173,13 +173,9 @@ public class VenInspector extends JFrame{
 					
 					//obtengo dia de la semana en que se conecta
 					String dia=null;
-					rs=st.executeQuery("SELECT CURDATE();");
+					rs=st.executeQuery("SELECT DAYOFWEEK(CURDATE());");
 					rs.first();
-					String fecha=Fechas.convertirDateAStringDB(rs.getDate(1));
-					rs.close();
-					rs=st.executeQuery("SELECT DAYOFWEEK('"+fecha+"');");
-					rs.first();
-					fecha=rs.getString(1);
+					String fecha=rs.getString(1);
 					rs.close();
 					switch (fecha) {
 					case "1" : dia="Do";
@@ -208,84 +204,94 @@ public class VenInspector extends JFrame{
 					else
 						if(hora>=14 && hora<19)
 							turno="T";
-						else {
-							//cancelo todo porque esta fuera de horario
-							btnIngresarPatente.setEnabled(true);
-							btnParquimetro.setEnabled(false);
-							tfCalle.setEnabled(false);
-							tfNumero.setEnabled(false);
-							tfParquimetro.setEnabled(false);
-							limpiarTexto();
-							JOptionPane.showMessageDialog(null,
-									"Esta fuera del horario de trabajo",
-									"Ingreso invalido",
-									JOptionPane.ERROR_MESSAGE);
-						}
+						else 
+							turno="x";
 					rs.close();
 					
-					//comprobar si se conecta el legajo en su determinado turno
-					int Id;
-					rs = st.executeQuery("SELECT id_asociado_con FROM Asociado_con WHERE legajo="+legajo+" AND"+
-					" calle='"+calle+"' AND altura="+numero+" AND dia='"+dia+"' AND turno='"+turno+"';");
-					if(rs.first()) {
-						//se conecto en su determinado turno
-						Id=Integer.parseInt(rs.getString(1));
-						rs.close();
-						
-						//obtengo id_parq y verifico que los datos de parquimetro sean correctos
-						rs = st.executeQuery("SELECT id_parq FROM Parquimetros WHERE numero="+parquimetro+" AND"+
-								" calle='"+calle+"' AND altura="+numero+" ;");
+					//si no esta en el turno especificado, reinicio todo
+					if(turno.equals("T") || turno.equals("M")) {
+					
+						//comprobar si se conecta el legajo en su determinado turno
+						int Id;
+						rs = st.executeQuery("SELECT id_asociado_con FROM Asociado_con WHERE legajo="+legajo+" AND"+
+						" calle='"+calle+"' AND altura="+numero+" AND dia='"+dia+"' AND turno='"+turno+"';");
 						if(rs.first()) {
-							//datos de parquimetros correctos
-							parquimetro=rs.getString(1);
+							//se conecto en su determinado turno
+							Id=Integer.parseInt(rs.getString(1));
 							rs.close();
 							
-							//ingresar acceso
-							st.executeUpdate("INSERT INTO Accede VALUES("+legajo+","+parquimetro+",CURDATE(),CURTIME());");
-							
-							//crear multas
-							for(int i=0;i<LP.size();i++) {
-								patente=LP.getElementAt(i);
-								//si la patente no esta en estacionados entonces hago una multa
-								rs=st.executeQuery("SELECT patente FROM estacionados WHERE patente='"+patente+"' AND calle='"+calle+"' AND "
-									+"altura="+numero+";");
-								if(!rs.first()) {
-									//hacer multa
-									st.executeUpdate("INSERT INTO Multa(fecha,hora,patente,id_asociado_con) VALUES (CURDATE(),"
-											+ "CURTIME(),'"+patente+"',"+Id+");");
-								}
+							//obtengo id_parq y verifico que los datos de parquimetro sean correctos
+							rs = st.executeQuery("SELECT id_parq FROM Parquimetros WHERE numero="+parquimetro+" AND"+
+									" calle='"+calle+"' AND altura="+numero+" ;");
+							if(rs.first()) {
+								//datos de parquimetros correctos
+								parquimetro=rs.getString(1);
 								rs.close();
+								
+								//ingresar acceso
+								st.executeUpdate("INSERT INTO Accede VALUES("+legajo+","+parquimetro+",CURDATE(),CURTIME());");
+								
+								//crear multas
+								for(int i=0;i<LP.size();i++) {
+									patente=LP.getElementAt(i);
+									//si la patente no esta en estacionados entonces hago una multa
+									rs=st.executeQuery("SELECT patente FROM estacionados WHERE patente='"+patente+"' AND calle='"+calle+"' AND "
+										+"altura="+numero+";");
+									if(!rs.first()) {
+										//hacer multa
+										st.executeUpdate("INSERT INTO Multa(fecha,hora,patente,id_asociado_con) VALUES (CURDATE(),"
+												+ "CURTIME(),'"+patente+"',"+Id+");");
+									}
+									rs.close();
+								}
+								LP.removeAllElements();
+								
+								//mostrar multas
+								txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con "+
+										"WHERE calle='"+calle+"' AND altura="+numero+" AND legajo="+legajo+
+										" AND fecha=CURDATE();";
+								refrescarTabla();
+								
+								//seteo todo para volver a empezar
+								btnIngresarPatente.setEnabled(true);
+								btnParquimetro.setEnabled(false);
+								tfCalle.setEnabled(false);
+								tfNumero.setEnabled(false);
+								tfParquimetro.setEnabled(false);
+								limpiarTexto();
+								LP.removeAllElements();
+						
+							}else {
+								JOptionPane.showMessageDialog(null,
+										"Parquimetro ingresado invalido",
+										"Ingreso invalido",
+										JOptionPane.ERROR_MESSAGE);
+								limpiarTexto();
+								LP.removeAllElements();
 							}
-							LP.removeAllElements();
-							
-							//mostrar multas
-							txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con "+
-									"WHERE calle='"+calle+"' AND altura="+numero+" AND legajo="+legajo+
-									" AND fecha=CURDATE();";
-							refrescarTabla();
-							
-							//seteo todo para volver a empezar
-							btnIngresarPatente.setEnabled(true);
-							btnParquimetro.setEnabled(false);
-							tfCalle.setEnabled(false);
-							tfNumero.setEnabled(false);
-							tfParquimetro.setEnabled(false);
-							limpiarTexto();
-					
 						}else {
 							JOptionPane.showMessageDialog(null,
-									"Parquimetro ingresado invalido",
+									"No puede ingresar al parquimetro en este turno",
 									"Ingreso invalido",
 									JOptionPane.ERROR_MESSAGE);
 							limpiarTexto();
+							LP.removeAllElements();
 						}
 					}else {
+						//cancelo todo porque esta fuera de horario
+						btnIngresarPatente.setEnabled(true);
+						btnParquimetro.setEnabled(false);
+						tfCalle.setEnabled(false);
+						tfNumero.setEnabled(false);
+						tfParquimetro.setEnabled(false);
+						limpiarTexto();
+						LP.removeAllElements();
 						JOptionPane.showMessageDialog(null,
-								"No puede ingresar al parquimetro en este turno",
+								"Esta fuera del horario de trabajo",
 								"Ingreso invalido",
 								JOptionPane.ERROR_MESSAGE);
-						limpiarTexto();
 					}
+						
 				
 				} catch (SQLException ex) {
 					salidaError(ex);
