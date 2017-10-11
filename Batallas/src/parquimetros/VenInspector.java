@@ -23,10 +23,8 @@ import java.awt.event.WindowEvent;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Types;
 import java.awt.event.ActionEvent;
-import javax.swing.JTable;
 import javax.swing.JList;
 import java.awt.Color;
 import javax.swing.JScrollPane;
@@ -39,6 +37,7 @@ public class VenInspector extends JFrame{
 	private JButton btnIngresarParquimetro;
 	private JButton btnPatente;
 	private JButton btnParquimetro;
+	private JButton btnEliminar;
 	private JTextField tfPatente;
 	private JTextField tfCalle;
 	private JTextField tfParquimetro;
@@ -49,12 +48,12 @@ public class VenInspector extends JFrame{
 	private DefaultListModel<String> LP;
 	
 	private DBTable tabla;
-	private DBTable tabla2;
 	private String legajo;
-	private String clave;
 	private String txtConsulta;
 	private String patente;
 	private JTextField tfNumero;
+	private JScrollPane scrollPane;
+	private JLabel lblNumero;
 	
 	private Fechas fecha;
 	
@@ -142,8 +141,22 @@ public class VenInspector extends JFrame{
 		btnPatente.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				patente=tfPatente.getText();
-				LP.addElement(patente);
-				//permitir eliminar patentes
+				//compruebo que la patente exista
+				try {
+					Statement st = (Statement) tabla.getConnection().createStatement();
+					ResultSet rs=st.executeQuery("SELECT patente FROM Automoviles WHERE patente='"+patente+"';");
+					if(rs.first())
+						LP.addElement(patente);
+					else
+						JOptionPane.showMessageDialog(null,
+								"La patente "+patente+" no existe",
+								"Ingreso invalido",
+								JOptionPane.ERROR_MESSAGE);
+						
+				} catch (SQLException ex) {
+					salidaError(ex);;
+				}
+
 			}
 		});
 		btnPatente.setEnabled(false);
@@ -167,8 +180,6 @@ public class VenInspector extends JFrame{
 				//obtener hora y turno de coneccion			
 				Statement st = null;
 				ResultSet rs = null;
-				Date fechaMulta;
-				Date horaMulta;
 				try {         				
 					st = (Statement) tabla.getConnection().createStatement();
 					
@@ -279,8 +290,6 @@ public class VenInspector extends JFrame{
 				
 			}
 		});
-
-		
 		
 		btnParquimetro.setEnabled(false);
 		btnParquimetro.setBounds(324, 102, 114, 25);
@@ -318,10 +327,12 @@ public class VenInspector extends JFrame{
 		
 		LP = new DefaultListModel<String>();
 		listaPatente = new JList<String>(LP);
-		listaPatente.setBounds(604, 16, 158, 365);
-		getContentPane().add(listaPatente);
 		
-		JLabel lblNumero = new JLabel("Numero:");
+		scrollPane = new JScrollPane(listaPatente);
+		scrollPane.setBounds(578, 11, 167, 325);
+		getContentPane().add(scrollPane);
+		
+		lblNumero = new JLabel("Numero:");
 		lblNumero.setBounds(23, 123, 66, 15);
 		getContentPane().add(lblNumero);
 		
@@ -331,8 +342,15 @@ public class VenInspector extends JFrame{
 		getContentPane().add(tfNumero);
 		tfNumero.setColumns(10);
 		
-		JButton btnEliminar = new JButton("Eliminar Patente");
+		btnEliminar = new JButton("Eliminar Patente");
 		btnEliminar.setBounds(621, 407, 124, 23);
+		btnEliminar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//elimino patente seleccionada
+				if(!listaPatente.isSelectionEmpty())
+					LP.remove(listaPatente.getSelectedIndex());
+			}
+		});
 		getContentPane().add(btnEliminar);
 		
 		JList list = new JList();
@@ -347,33 +365,14 @@ public class VenInspector extends JFrame{
 	}
 
 	private void crearTabla() {
-		// crea la tabla  
 		tabla = new DBTable();
-		tabla.setBounds(35, 250, 300, 300);
-
-		// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
+		tabla.setBounds(35, 250, 500, 300);
 		getContentPane().add(tabla);           
-
-		// setea la tabla para sólo lectura (no se puede editar su contenido)  
 		tabla.setEditable(false);       
-		
-		// crea la tabla  
-		tabla2 = new DBTable();
-		tabla2.setBounds(350, 250, 200, 300);
-
-		// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
-		getContentPane().add(tabla2);           
-
-		// setea la tabla para sólo lectura (no se puede editar su contenido)  
-		tabla2.setEditable(false); 	      
-
-
 	}
 
-	private void conectarBD()
-	{
-		try
-		{
+	private void conectarBD(){
+		try{
 			String driver ="com.mysql.jdbc.Driver";
 			String servidor = "localhost:3306";
 			String baseDatos = "parquimetros";
@@ -382,8 +381,7 @@ public class VenInspector extends JFrame{
 			//establece una conexión con la  B.D. "parquimetros"  usando directamante una tabla DBTable    
 			tabla.connectDatabase(driver, uriConexion, "inspector", "inspector");
 		}
-		catch (SQLException ex)
-		{
+		catch (SQLException ex){
 			JOptionPane.showMessageDialog(this,
 					"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
 					"Error",
@@ -397,39 +395,32 @@ public class VenInspector extends JFrame{
 		}
 	}
 
-	private void desconectarBD()
-	{
-		try
-		{
+	private void desconectarBD(){
+		try{
 			tabla.close();            
 		}
-		catch (SQLException ex)
-		{
+		catch (SQLException ex){
 			System.out.println("SQLException: " + ex.getMessage());
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
 		}      
 	}
 
-	private void refrescarTabla()
-	{
-		try
-		{    
+	private void refrescarTabla(){
+		try{    
 			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
 			tabla.setSelectSql(this.txtConsulta);
 
 			// obtenemos el modelo de la tabla a partir de la consulta para 
 			// modificar la forma en que se muestran de algunas columnas  
 			tabla.createColumnModelFromQuery();    	    
-			for (int i = 0; i < tabla.getColumnCount(); i++)
-			{ // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-				if	 (tabla.getColumn(i).getType()==Types.TIME)  
-				{    		 
+			for (int i = 0; i < tabla.getColumnCount(); i++){ 
+				// para que muestre correctamente los valores de tipo TIME (hora)  		   		  
+				if	 (tabla.getColumn(i).getType()==Types.TIME) {    		 
 					tabla.getColumn(i).setType(Types.CHAR);  
 				}
 				// cambiar el formato en que se muestran los valores de tipo DATE
-				if	 (tabla.getColumn(i).getType()==Types.DATE)
-				{
+				if	 (tabla.getColumn(i).getType()==Types.DATE){
 					tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
 				}
 			}  
@@ -438,12 +429,8 @@ public class VenInspector extends JFrame{
 			// No es necesario establecer  una conexión, crear una sentencia y recuperar el 
 			// resultado en un resultSet, esto lo hace automáticamente la tabla (DBTable) a 
 			// patir  de  la conexión y la consulta seteadas con connectDatabase() y setSelectSql() respectivamente.
-
-
-
 		}
-		catch (SQLException ex)
-		{
+		catch (SQLException ex){
 			// en caso de error, se muestra la causa en la consola
 			System.out.println("SQLException: " + ex.getMessage());
 			System.out.println("SQLState: " + ex.getSQLState());
@@ -452,7 +439,6 @@ public class VenInspector extends JFrame{
 					ex.getMessage() + "\n", 
 					"Error al ejecutar la consulta.",
 					JOptionPane.ERROR_MESSAGE);
-
 		}
 	}
 	
