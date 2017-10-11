@@ -34,6 +34,7 @@ import com.mysql.jdbc.Statement;
 import quick.dbtable.*;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -358,11 +359,18 @@ public class VenConsultas extends javax.swing.JFrame
 	{
 		try
 		{    
-		
-			
+			if(txtConsulta.getText(0, 6).toLowerCase().equals("insert")||
+					txtConsulta.getText(0, 6).toLowerCase().equals("delete")||
+					txtConsulta.getText(0, 6).toLowerCase().equals("update")){
+				System.out.printf("\n \n \n"+txtConsulta.getText(0,6).toLowerCase() + "esto es lo que estooy imprimiendo \n \n \n");
+				Statement st = (Statement) tabla.getConnection().createStatement();
+				st.executeUpdate(txtConsulta.getText());
+				st.close();
+			}
+			else {
 			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
 			tabla.setSelectSql(this.txtConsulta.getText().trim());
-
+			}
 			// obtenemos el modelo de la tabla a partir de la consulta para 
 			// modificar la forma en que se muestran de algunas columnas  
 			tabla.createColumnModelFromQuery();    	    
@@ -398,6 +406,9 @@ public class VenConsultas extends javax.swing.JFrame
 					"Error al ejecutar la consulta.",
 					JOptionPane.ERROR_MESSAGE);
 
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}
