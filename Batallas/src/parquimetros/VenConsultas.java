@@ -359,33 +359,35 @@ public class VenConsultas extends javax.swing.JFrame
 	{
 		try
 		{    
+			String comando = new String(txtConsulta.getText());
 			if(txtConsulta.getText(0, 6).toLowerCase().equals("insert")||
 					txtConsulta.getText(0, 6).toLowerCase().equals("delete")||
 					txtConsulta.getText(0, 6).toLowerCase().equals("update")){
-				System.out.printf("\n \n \n"+txtConsulta.getText(0,6).toLowerCase() + "esto es lo que estooy imprimiendo \n \n \n");
+				System.out.printf("\n \n \n"+comando + "esto es lo que estooy imprimiendo \n \n \n");
 				Statement st = (Statement) tabla.getConnection().createStatement();
-				st.executeUpdate(txtConsulta.getText());
+				st.executeUpdate(comando.trim());
 				st.close();
 			}
 			else {
-			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
-			tabla.setSelectSql(this.txtConsulta.getText().trim());
+				// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
+				tabla.setSelectSql(this.txtConsulta.getText().trim());
+				
+				// obtenemos el modelo de la tabla a partir de la consulta para 
+				// modificar la forma en que se muestran de algunas columnas  
+				tabla.createColumnModelFromQuery();    	    
+				for (int i = 0; i < tabla.getColumnCount(); i++)
+				{ // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
+					if	 (tabla.getColumn(i).getType()==Types.TIME)  
+					{    		 
+						tabla.getColumn(i).setType(Types.CHAR);  
+					}
+					// cambiar el formato en que se muestran los valores de tipo DATE
+					if	 (tabla.getColumn(i).getType()==Types.DATE)
+					{
+						tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
+					}
+				}  
 			}
-			// obtenemos el modelo de la tabla a partir de la consulta para 
-			// modificar la forma en que se muestran de algunas columnas  
-			tabla.createColumnModelFromQuery();    	    
-			for (int i = 0; i < tabla.getColumnCount(); i++)
-			{ // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-				if	 (tabla.getColumn(i).getType()==Types.TIME)  
-				{    		 
-					tabla.getColumn(i).setType(Types.CHAR);  
-				}
-				// cambiar el formato en que se muestran los valores de tipo DATE
-				if	 (tabla.getColumn(i).getType()==Types.DATE)
-				{
-					tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
-				}
-			}  
 			// actualizamos el contenido de la tabla.   	     	  
 			tabla.refresh();
 			// No es necesario establecer  una conexión, crear una sentencia y recuperar el 
