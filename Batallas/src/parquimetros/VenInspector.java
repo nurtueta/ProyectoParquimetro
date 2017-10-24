@@ -59,10 +59,15 @@ public class VenInspector extends JFrame{
 	private String legajo;
 	private String txtConsulta;
 	private String patente;
+	private String calle;
+	private String parquimetro;
+	private String numero;
 	
-	private Vector<String> ubicacion;
-	private Vector<Integer> numero;
-	private Vector<Integer> parquimetro;
+	private int Id;
+	
+	private Vector<String> ubicaciones;
+	private Vector<Integer> numeros;
+	private Vector<Integer> parquimetros;
 	
 	private JScrollPane scrollPane;
 	
@@ -109,20 +114,20 @@ public class VenInspector extends JFrame{
 		scrollPane.setBounds(578, 11, 167, 325);
 		getContentPane().add(scrollPane);
 		
-		ubicacion=new Vector<String>();
-		boxUbicacion = new JComboBox(ubicacion);
+		ubicaciones=new Vector<String>();
+		boxUbicacion = new JComboBox(ubicaciones);
 		boxUbicacion.setEnabled(false);
 		boxUbicacion.setBounds(135, 86, 124, 24);
 		getContentPane().add(boxUbicacion);
 		
-		numero=new Vector<Integer>();
-		boxNumero = new JComboBox(numero);
+		numeros=new Vector<Integer>();
+		boxNumero = new JComboBox(numeros);
 		boxNumero.setEnabled(false);
 		boxNumero.setBounds(135, 118, 124, 24);
 		getContentPane().add(boxNumero);
 		
-		parquimetro=new Vector<Integer>();
-		boxParquimetro = new JComboBox(parquimetro);
+		parquimetros=new Vector<Integer>();
+		boxParquimetro = new JComboBox(parquimetros);
 		boxParquimetro.setEnabled(false);
 		boxParquimetro.setBounds(135, 150, 124, 25);
 		getContentPane().add(boxParquimetro);
@@ -311,59 +316,29 @@ public class VenInspector extends JFrame{
 							"Faltan ingresar datos",
 							"Ingreso invalido",
 							JOptionPane.ERROR_MESSAGE);
-				else {
-					String calle=(String) boxUbicacion.getSelectedItem();
-					String parquimetro=(String) boxParquimetro.getSelectedItem();
-					String numero=(String) boxNumero.getSelectedItem();
-							
+				else {	
 					Statement st = null;
 					ResultSet rs = null;
-					try {         				
+					try { 
+						String dia;
+						String turno;
+						calle=(String) boxUbicacion.getSelectedItem();
+						parquimetro=(String) boxParquimetro.getSelectedItem();
+						numero=(String) boxNumero.getSelectedItem();
+						
 						st = (Statement) tabla.getConnection().createStatement();
 						
 						//obtengo dia de la semana en que se conecta
-						String dia=null;
-						rs=st.executeQuery("SELECT DAYOFWEEK(CURDATE());");
-						rs.first();
-						String fecha=rs.getString(1);
-						rs.close();
-						switch (fecha) {
-						case "1" : dia="Do";
-									break;
-						case "2" : dia="Lu";
-									break;
-						case "3" : dia="Ma";
-									break;
-						case "4" : dia="Mi";
-									break;
-						case "5" : dia="Ju";
-									break;
-						case "6" : dia="Vi";
-									break;
-						case "7" : dia="Sa";
-									break;
-						}
+						dia=obtenerDiaSemana(st,rs);
 						
 						//obtengo turno de ingreso
-						String turno=null;
-						rs=st.executeQuery("SELECT CURTIME();");
-						rs.first();
-						int hora=Integer.parseInt(rs.getString(1).substring(0,2));
-						if((hora<=8) && hora<14)
-							turno="M";
-						else
-							if(hora>=14 && hora<19)
-								turno="T";
-							else 
-//								turno="x";
-								turno="M";
-						rs.close();
+						turno=obtenerTurno(st,rs);
+						
 						
 						//si no esta en el turno especificado, reinicio todo
 						if(turno.equals("T") || turno.equals("M")) {
 						
 							//comprobar si se conecta el legajo en su determinado turno
-							int Id;
 							rs = st.executeQuery("SELECT id_asociado_con FROM Asociado_con WHERE legajo="+legajo+" AND"+
 							" calle='"+calle+"' AND altura="+numero+" AND dia='"+dia+"' AND turno='"+turno+"';");
 							//if(rs.first()) {
@@ -384,26 +359,7 @@ public class VenInspector extends JFrame{
 									//ingresar acceso
 									st.executeUpdate("INSERT INTO Accede VALUES("+legajo+","+parquimetro+",CURDATE(),CURTIME());");
 									
-									//crear multas
-									for(int i=0;i<LP.size();i++) {
-										patente=LP.getElementAt(i);
-										//si la patente no esta en estacionados entonces hago una multa
-										rs=st.executeQuery("SELECT patente FROM estacionados WHERE patente='"+patente+"' AND calle='"+calle+"' AND "
-											+"altura="+numero+";");
-										if(!rs.first()) {
-											//hacer multa
-											st.executeUpdate("INSERT INTO Multa(fecha,hora,patente,id_asociado_con) VALUES (CURDATE(),"
-													+ "CURTIME(),'"+patente+"',"+Id+");");
-										}
-										rs.close();
-									}
-									LP.removeAllElements();
-									
-									//mostrar multas
-									txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con "+
-											"WHERE calle='"+calle+"' AND altura="+numero+" AND legajo="+legajo+
-											" AND fecha=CURDATE();";
-									refrescarTabla();
+									generarYMostrarMultas(st,rs);
 									
 									//seteo todo para volver a empezar
 									btnIngresarPatente.setEnabled(true);
@@ -480,7 +436,81 @@ public class VenInspector extends JFrame{
 			}
 		});
 	}
+	
+	private String obtenerDiaSemana(Statement st,ResultSet rs)throws SQLException{
+		//obtengo dia de la semana en que se conecta
+		String dia=null;
+		
+		rs=st.executeQuery("SELECT DAYOFWEEK(CURDATE());");
+		rs.first();
+		
+		String fecha=rs.getString(1);
+		rs.close();
+		
+		switch (fecha) {
+		case "1" : dia="Do";
+					break;
+		case "2" : dia="Lu";
+					break;
+		case "3" : dia="Ma";
+					break;
+		case "4" : dia="Mi";
+					break;
+		case "5" : dia="Ju";
+					break;
+		case "6" : dia="Vi";
+					break;
+		case "7" : dia="Sa";
+					break;
+		}
+		return dia;
+	}
 
+	private String obtenerTurno(Statement st,ResultSet rs)throws SQLException{
+		String turno;
+		int hora;
+		
+		rs=st.executeQuery("SELECT CURTIME();");
+		rs.first();
+		
+		hora=Integer.parseInt(rs.getString(1).substring(0,2));
+		rs.close();
+		
+		if((hora<=8) && hora<14)
+			turno="M";
+		else
+			if(hora>=14 && hora<19)
+				turno="T";
+			else 
+//				turno="x";
+				turno="M";
+
+		return turno;
+	}
+	
+	private void generarYMostrarMultas(Statement st,ResultSet rs) throws SQLException{
+		//crear multas
+		for(int i=0;i<LP.size();i++) {
+			patente=LP.getElementAt(i);
+			//si la patente no esta en estacionados entonces hago una multa
+			rs=st.executeQuery("SELECT patente FROM estacionados WHERE patente='"+patente+"' AND calle='"+calle+"' AND "
+				+"altura="+numeros+";");
+			if(!rs.first()) {
+				//hacer multa
+				st.executeUpdate("INSERT INTO Multa(fecha,hora,patente,id_asociado_con) VALUES (CURDATE(),"
+						+ "CURTIME(),'"+patente+"',"+Id+");");
+			}
+			rs.close();
+		}
+		LP.removeAllElements();
+		
+		//mostrar multas
+		txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con "+
+				"WHERE calle='"+calle+"' AND altura="+numeros+" AND legajo="+legajo+
+				" AND fecha=CURDATE();";
+		refrescarTabla();
+	}
+	
 	private void conectarBD(){
 		try{
 			String driver ="com.mysql.jdbc.Driver";
