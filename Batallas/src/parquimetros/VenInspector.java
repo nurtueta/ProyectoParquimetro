@@ -197,15 +197,14 @@ public class VenInspector extends JFrame{
 		
 		boxUbicacion.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				parquimetro.removeAllElements();
-				boxParquimetro.setSelectedItem(null);
-				numero.removeAllElements();
+				boxParquimetro.removeAllItems();
+				boxNumero.removeAllItems();
 				try {
 					Statement st = (Statement) tabla.getConnection().createStatement();
 					ResultSet rs=st.executeQuery("SELECT altura FROM Parquimetros WHERE calle='"+
 							boxUbicacion.getSelectedItem()+"' GROUP BY altura ;");
 					while(rs.next()){
-						numero.addElement(Integer.parseInt(rs.getString(1)));
+						boxNumero.addItem(Integer.parseInt(rs.getString(1)));
 					}
 					boxNumero.setSelectedItem(null);
 				} catch (SQLException ex) {
@@ -216,13 +215,13 @@ public class VenInspector extends JFrame{
 		
 		boxNumero.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				parquimetro.removeAllElements();
+				boxParquimetro.removeAllItems();
 				try {
 					Statement st = (Statement) tabla.getConnection().createStatement();
 					ResultSet rs=st.executeQuery("SELECT numero FROM Parquimetros WHERE calle='"+
 							boxUbicacion.getSelectedItem()+"' AND altura="+boxNumero.getSelectedItem()+";");
 					while(rs.next()){
-						parquimetro.addElement(Integer.parseInt(rs.getString(1)));
+						boxParquimetro.addItem(Integer.parseInt(rs.getString(1)));
 					}
 					boxParquimetro.setSelectedItem(null);
 				} catch (SQLException ex) {
@@ -266,7 +265,7 @@ public class VenInspector extends JFrame{
 					Statement st = (Statement) tabla.getConnection().createStatement();
 					ResultSet rs=st.executeQuery("SELECT calle FROM Parquimetros GROUP BY calle;");
 					while(rs.next()){
-						ubicacion.addElement(rs.getString(1));
+						boxUbicacion.addItem(rs.getString(1));
 					}
 				} catch (SQLException ex) {
 					salidaError(ex);;
@@ -297,7 +296,7 @@ public class VenInspector extends JFrame{
 								JOptionPane.ERROR_MESSAGE);
 						
 				} catch (SQLException ex) {
-					salidaError(ex);;
+					salidaError(ex);
 				}
 				tfPatente.setText("");
 			}
