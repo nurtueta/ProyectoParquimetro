@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Types;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -53,11 +54,9 @@ public class VenConsultas extends javax.swing.JFrame
 	private JList<String> list_1;
 	private DefaultListModel<String> DLM;
 	private DefaultListModel<String> DLM_1;
-	private JButton btnRefrescar;
 
 	private String usuario;
 	private String clave;
-	private JButton btnNewButton;
 	private JPanel btnAtras;
 
 
@@ -89,54 +88,6 @@ public class VenConsultas extends javax.swing.JFrame
 			});
 			getContentPane().setLayout(null);
 			{
-				btnRefrescar = new JButton();
-				btnRefrescar.setEnabled(false);
-				btnRefrescar.setBounds(539, 197, 101, 29);
-				getContentPane().add(btnRefrescar);
-				btnRefrescar.setText("Refrescar");
-				btnRefrescar.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						DLM.clear();     
-						Statement st = null;
-						ResultSet rs = null;
-						try {         				
-							st = (Statement) tabla.getConnection().createStatement();
-							rs = st.executeQuery("SELECT table_name FROM "
-									+ "information_schema.tables where "
-									+ "table_schema='parquimetros'");
-							boolean sig = rs.first();
-							while(sig) {
-								DLM.addElement(rs.getString(1));
-								sig = rs.next();												
-							}      			
-						} catch (SQLException ex) {
-							salidaError(ex);
-						} catch (NullPointerException ex2){
-							JOptionPane.showMessageDialog(null,
-									"Error",
-									"Error",
-									JOptionPane.ERROR_MESSAGE);
-						}
-						finally {					
-							if(st != null) {
-								try {
-									st.close();
-								} catch (SQLException ex) {
-									salidaError(ex);
-								}
-							}
-							if(rs != null) {
-								try {
-									rs.close();
-								} catch (SQLException ex) {
-									salidaError(ex);
-								}
-							}
-						}
-					}
-				});
-			}
-			{
 				pnlConsulta = new JPanel();
 				pnlConsulta.setBackground(new Color(255, 153, 102));
 				pnlConsulta.setBounds(0, 0, 784, 186);
@@ -148,7 +99,7 @@ public class VenConsultas extends javax.swing.JFrame
 					pnlConsulta.add(scrConsulta);
 					{
 						txtConsulta = new JTextArea();
-						scrConsulta.setRowHeaderView(txtConsulta);
+						scrConsulta.setColumnHeaderView(txtConsulta);
 						txtConsulta.setTabSize(3);
 						txtConsulta.setColumns(80);
 						txtConsulta.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
@@ -173,30 +124,26 @@ public class VenConsultas extends javax.swing.JFrame
 					botonBorrar = new JButton();
 					botonBorrar.setBounds(647, 51, 101, 29);
 					pnlConsulta.add(botonBorrar);
-					botonBorrar.setText("Borrar");            
-					
-								btnNewButton = new JButton("Reconectar");
-								btnNewButton.setBounds(647, 146, 101, 29);
-								pnlConsulta.add(btnNewButton);
-								
-								JButton btnNewButton_1 = new JButton("Atras");
-								btnNewButton_1.addActionListener(new ActionListener() {
-									public void actionPerformed(ActionEvent arg0) {
-										
-										desconectarBD();
-										setVisible(false);
-										String [] args = null;
-										VenPrincipal.main(args);;
-										
-									}
-								});
-								btnNewButton_1.setBounds(0, 0, 60, 60);
-								pnlConsulta.add(btnNewButton_1);
-								
+					botonBorrar.setText("Borrar");
+
+					JButton btnNewButton_1 = new JButton("Atras");
+					btnNewButton_1.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+
+							desconectarBD();
+							setVisible(false);
+							String [] args = null;
+							VenPrincipal.main(args);;
+
+						}
+					});
+					btnNewButton_1.setBounds(0, 0, 60, 60);
+					pnlConsulta.add(btnNewButton_1);
 
 
-								
-								
+
+
+
 					botonBorrar.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0) {
 							txtConsulta.setText("");            			
@@ -222,54 +169,19 @@ public class VenConsultas extends javax.swing.JFrame
 			}
 
 			JPanel panel = new JPanel();
-			panel.setBounds(392, 231, 392, 330);
+			panel.setBounds(392, 186, 392, 375);
 			getContentPane().add(panel);
 			panel.setLayout(null);
 
 			JScrollPane scrollPane = new JScrollPane();
-			scrollPane.setBounds(0, 0, 194, 330);
+			scrollPane.setBounds(0, 0, 194, 375);
 			panel.add(scrollPane);
 
 			DLM = new DefaultListModel<String>();
 			list = new JList<String>(DLM);               
 			list.addListSelectionListener(new ListSelectionListener() {
 				public void valueChanged(ListSelectionEvent arg0) {
-					DLM_1.clear();
-					if(DLM.getSize()> 0) {         			
-						String selected = (String) list.getSelectedValue();
-						selected = "'"+selected+"'";
-						Statement st = null;
-						ResultSet rs = null;
-						try {
-							st = (Statement) tabla.getConnection().createStatement();
-							rs = st.executeQuery("SELECT COLUMN_NAME FROM "
-									+ "INFORMATION_SCHEMA.COLUMNS "
-									+ "WHERE TABLE_SCHEMA='parquimetros' "
-									+ "AND TABLE_NAME="+selected );
-							boolean sig = rs.first();
-							while(sig) {
-								DLM_1.addElement(rs.getString(1));
-								sig = rs.next();
-							}
-						} catch (SQLException ex) {
-							salidaError(ex);
-						}  finally {
-							if(st != null) {
-								try {
-									st.close();
-								} catch (SQLException ex) {
-									salidaError(ex);
-								}
-							}
-							if(rs != null) {
-								try {
-									rs.close();
-								} catch (SQLException ex) {
-									salidaError(ex);
-								}
-							}
-						}         			        			
-					}  
+					mostrarColumnas();
 				}				
 			});			
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -277,7 +189,7 @@ public class VenConsultas extends javax.swing.JFrame
 			scrollPane.setViewportView(list);
 
 			JScrollPane scrollPane_1 = new JScrollPane();
-			scrollPane_1.setBounds(197, 0, 194, 330);
+			scrollPane_1.setBounds(197, 0, 194, 375);
 			panel.add(scrollPane_1);
 
 			DLM_1 = new DefaultListModel<String>();
@@ -289,9 +201,88 @@ public class VenConsultas extends javax.swing.JFrame
 		}
 
 		conectarBD();
+		mostrarTablas();
 
 	}
 
+	private void mostrarTablas() {
+		DLM.clear();
+		Statement st = null;
+		ResultSet rs = null;
+		try {         				
+			st = (Statement) tabla.getConnection().createStatement();
+			rs = st.executeQuery("SELECT table_name FROM "
+					+ "information_schema.tables where "
+					+ "table_schema='parquimetros'");
+			boolean sig = rs.first();
+			while(sig) {
+				DLM.addElement(rs.getString(1));
+				sig = rs.next();												
+			}      			
+		} catch (SQLException ex) {
+			salidaError(ex);
+		} catch (NullPointerException ex2){
+			JOptionPane.showMessageDialog(null,
+					"Error",
+					"Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
+		finally {					
+			if(st != null) {
+				try {
+					st.close();
+				} catch (SQLException ex) {
+					salidaError(ex);
+				}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+					salidaError(ex);
+				}
+			}
+		}
+	}
+
+	public void mostrarColumnas() {
+		DLM_1.clear();
+		if(DLM.getSize()> 0) {         			
+			String selected = (String) list.getSelectedValue();
+			selected = "'"+selected+"'";
+			Statement st = null;
+			ResultSet rs = null;
+			try {
+				st = (Statement) tabla.getConnection().createStatement();
+				rs = st.executeQuery("SELECT COLUMN_NAME FROM "
+						+ "INFORMATION_SCHEMA.COLUMNS "
+						+ "WHERE TABLE_SCHEMA='parquimetros' "
+						+ "AND TABLE_NAME="+selected );
+				boolean sig = rs.first();
+				while(sig) {
+					DLM_1.addElement(rs.getString(1));
+					sig = rs.next();
+				}
+			} catch (SQLException ex) {
+				salidaError(ex);
+			}  finally {
+				if(st != null) {
+					try {
+						st.close();
+					} catch (SQLException ex) {
+						salidaError(ex);
+					}
+				}
+				if(rs != null) {
+					try {
+						rs.close();
+					} catch (SQLException ex) {
+						salidaError(ex);
+					}
+				}
+			}         			        			
+		}
+	}
 	private void salidaError(SQLException ex) {
 		JOptionPane.showMessageDialog(null,
 				ex.getMessage(),
@@ -319,7 +310,6 @@ public class VenConsultas extends javax.swing.JFrame
 			//establece una conexión con la  B.D. "parquimetros"  usando directamante una tabla DBTable    
 			tabla.connectDatabase(driver, uriConexion, usuario, clave);
 			btnEjecutar.setEnabled(true);
-			btnRefrescar.setEnabled(true);
 		}
 		catch (SQLException ex)
 		{
@@ -331,7 +321,6 @@ public class VenConsultas extends javax.swing.JFrame
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
 			btnEjecutar.setEnabled(false);
-			btnRefrescar.setEnabled(false);
 		}
 		catch (ClassNotFoundException e)
 		{			
@@ -359,50 +348,34 @@ public class VenConsultas extends javax.swing.JFrame
 	{
 		try
 		{    
-			/**
-			 * Si el comando modifica la tabla, ingresa aqui
-			 */
+
 			String comando = new String(txtConsulta.getText());
-			if(txtConsulta.getText(0, 6).toLowerCase().equals("insert")||
-					txtConsulta.getText(0, 6).toLowerCase().equals("delete")||
-					txtConsulta.getText(0, 6).toLowerCase().equals("update")){
-				System.out.printf("\n \n \n"+comando + "esto es lo que estooy imprimiendo \n \n \n");
-				Statement st = (Statement) tabla.getConnection().createStatement();
-				st.executeUpdate(comando.trim());
-				st.close();
-			}
-			else {
-				
-				/*
-				 * Si el comando es de consulta para la tabla, ingresa aqui.
-				 */
+			if(txtConsulta.getText(0, 6).toLowerCase().equals("select")){// Si el comando no modifica la base de datos, ingresa aqui.							 
 				// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
-				tabla.setSelectSql(this.txtConsulta.getText().trim());
-				
-				// obtenemos el modelo de la tabla a partir de la consulta para 
-				// modificar la forma en que se muestran de algunas columnas  
+				tabla.setSelectSql(this.txtConsulta.getText().trim());		
+			}
+			else { //modifica la base de datos				
+				PreparedStatement pstmt = tabla.getConnection().prepareStatement(comando);
+				pstmt.execute();			
+				String selec = list.getSelectedValue();
+				mostrarTablas();
+				list.setSelectedIndex(DLM.indexOf(selec));
+			}
+			if(tabla.getSelectSql() != null) {
 				tabla.createColumnModelFromQuery();    	    
 				for (int i = 0; i < tabla.getColumnCount(); i++)
-				{ // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
+				{	   		  
 					if	 (tabla.getColumn(i).getType()==Types.TIME)  
 					{    		 
 						tabla.getColumn(i).setType(Types.CHAR);  
 					}
-					// cambiar el formato en que se muestran los valores de tipo DATE
 					if	 (tabla.getColumn(i).getType()==Types.DATE)
 					{
 						tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
 					}
-				}  
+				}				
+				tabla.refresh();
 			}
-			// actualizamos el contenido de la tabla.   	     	  
-			tabla.refresh();
-			// No es necesario establecer  una conexión, crear una sentencia y recuperar el 
-			// resultado en un resultSet, esto lo hace automáticamente la tabla (DBTable) a 
-			// patir  de  la conexión y la consulta seteadas con connectDatabase() y setSelectSql() respectivamente.
-
-
-
 		}
 		catch (SQLException ex)
 		{
@@ -419,6 +392,5 @@ public class VenConsultas extends javax.swing.JFrame
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 }
