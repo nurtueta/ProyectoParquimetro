@@ -60,8 +60,8 @@ public class VenInspector extends JFrame{
 	private String txtConsulta;
 	private String patente;
 	private String calle;
-	private String parquimetro;
-	private String numero;
+	private Integer parquimetro;
+	private Integer numero;
 	
 	private int Id;
 	
@@ -323,8 +323,8 @@ public class VenInspector extends JFrame{
 						String dia;
 						String turno;
 						calle=(String) boxUbicacion.getSelectedItem();
-						parquimetro=(String) boxParquimetro.getSelectedItem();
-						numero=(String) boxNumero.getSelectedItem();
+						parquimetro= (Integer) boxParquimetro.getSelectedItem();
+						numero= (Integer) boxNumero.getSelectedItem();
 						
 						st = (Statement) tabla.getConnection().createStatement();
 						
@@ -341,9 +341,7 @@ public class VenInspector extends JFrame{
 							//comprobar si se conecta el legajo en su determinado turno
 							rs = st.executeQuery("SELECT id_asociado_con FROM Asociado_con WHERE legajo="+legajo+" AND"+
 							" calle='"+calle+"' AND altura="+numero+" AND dia='"+dia+"' AND turno='"+turno+"';");
-							//if(rs.first()) {
-							//pruebo para conectar siempre
-							if(true) {
+							if(rs.first()) {
 								//se conecto en su determinado turno
 								Id=Integer.parseInt(rs.getString(1));
 								rs.close();
@@ -351,9 +349,10 @@ public class VenInspector extends JFrame{
 								//obtengo id_parq y verifico que los datos de parquimetro sean correctos
 								rs = st.executeQuery("SELECT id_parq FROM Parquimetros WHERE numero="+parquimetro+" AND"+
 										" calle='"+calle+"' AND altura="+numero+" ;");
+								
 								if(rs.first()) {
 									//datos de parquimetros correctos
-									parquimetro=rs.getString(1);
+									parquimetro=Integer.parseInt(rs.getString(1));
 									rs.close();
 									
 									//ingresar acceso
@@ -483,7 +482,7 @@ public class VenInspector extends JFrame{
 				turno="T";
 			else 
 //				turno="x";
-				turno="M";
+				turno="T";
 
 		return turno;
 	}
@@ -494,7 +493,7 @@ public class VenInspector extends JFrame{
 			patente=LP.getElementAt(i);
 			//si la patente no esta en estacionados entonces hago una multa
 			rs=st.executeQuery("SELECT patente FROM estacionados WHERE patente='"+patente+"' AND calle='"+calle+"' AND "
-				+"altura="+numeros+";");
+				+"altura="+numero+";");
 			if(!rs.first()) {
 				//hacer multa
 				st.executeUpdate("INSERT INTO Multa(fecha,hora,patente,id_asociado_con) VALUES (CURDATE(),"
@@ -506,7 +505,7 @@ public class VenInspector extends JFrame{
 		
 		//mostrar multas
 		txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con "+
-				"WHERE calle='"+calle+"' AND altura="+numeros+" AND legajo="+legajo+
+				"WHERE calle='"+calle+"' AND altura="+numero+" AND legajo="+legajo+
 				" AND fecha=CURDATE();";
 		refrescarTabla();
 	}
