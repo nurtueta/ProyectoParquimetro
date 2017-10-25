@@ -37,7 +37,7 @@ public class VenInspector extends JFrame{
 	private JButton btnPatente;
 	private JButton btnParquimetro;
 	private JButton btnEliminar;
-	private JButton btnCancelar;
+	private JButton btnReiniciar;
 	private JButton btnAtras;
 	
 	private JComboBox boxUbicacion;
@@ -103,6 +103,7 @@ public class VenInspector extends JFrame{
 		crearOtros();
 		crearBotones();
 		cargarOyentes();
+		conectarBD();
 
 	}
 	
@@ -182,9 +183,9 @@ public class VenInspector extends JFrame{
 		btnParquimetro.setBounds(324, 102, 114, 25);
 		getContentPane().add(btnParquimetro);
 		
-		btnCancelar = new JButton("Cancelar");
-		btnCancelar.setBounds(324, 140, 114, 25);
-		getContentPane().add(btnCancelar);
+		btnReiniciar = new JButton("Reiniciar");
+		btnReiniciar.setBounds(324, 140, 114, 25);
+		getContentPane().add(btnReiniciar);
 		
 		btnEliminar = new JButton("Eliminar Patente");
 		btnEliminar.setBounds(621, 407, 124, 23);
@@ -240,15 +241,17 @@ public class VenInspector extends JFrame{
 				//conecto a la BD y habilito las operaciones siguientes
 				btnPatente.setEnabled(true);
 				tfPatente.setEnabled(true);
+				btnParquimetro.setEnabled(false);
 				btnIngresarParquimetro.setEnabled(true);
 				btnIngresarPatente.setEnabled(false);
-				conectarBD();		
+				boxParquimetro.setSelectedItem(null);
+				boxNumero.setSelectedItem(null);
+				boxUbicacion.setSelectedItem(null);		
 			}
 		});
 
 		btnAtras.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(tabla !=null)
 				desconectarBD();
 				setVisible(false);
 				String [] args = null;
@@ -261,7 +264,9 @@ public class VenInspector extends JFrame{
 				btnPatente.setEnabled(false);
 				tfPatente.setEnabled(false);
 				btnIngresarParquimetro.setEnabled(false);
+				btnIngresarPatente.setEnabled(true);
 				btnParquimetro.setEnabled(true);
+				boxUbicacion.removeAllItems();
 				boxUbicacion.setEnabled(true);
 				boxNumero.setEnabled(true);
 				boxParquimetro.setEnabled(true);
@@ -335,7 +340,7 @@ public class VenInspector extends JFrame{
 						turno=obtenerTurno(st,rs);
 						
 						
-						//si no esta en el turno especificado, reinicio todo
+						//compruebo que este en el horario de trabajo
 						if(turno.equals("T") || turno.equals("M")) {
 						
 							//comprobar si se conecta el legajo en su determinado turno
@@ -346,10 +351,10 @@ public class VenInspector extends JFrame{
 								Id=Integer.parseInt(rs.getString(1));
 								rs.close();
 								
-								//obtengo id_parq y verifico que los datos de parquimetro sean correctos
+								//obtengo id_parq 
 								rs = st.executeQuery("SELECT id_parq FROM Parquimetros WHERE numero="+parquimetro+" AND"+
 										" calle='"+calle+"' AND altura="+numero+" ;");
-								
+								//siempre van a ser correctos, porque no le doy eleccion incorrecta al usuario
 								if(rs.first()) {
 									//datos de parquimetros correctos
 									parquimetro=Integer.parseInt(rs.getString(1));
@@ -364,31 +369,19 @@ public class VenInspector extends JFrame{
 									btnIngresarPatente.setEnabled(true);
 									btnParquimetro.setEnabled(false);
 							
-								}else {
-									JOptionPane.showMessageDialog(null,
-											"Parquimetro ingresado invalido",
-											"Ingreso invalido",
-											JOptionPane.ERROR_MESSAGE);
-									LP.removeAllElements();
 								}
 							}else {
 								JOptionPane.showMessageDialog(null,
-										"No puede ingresar al parquimetro en este turno",
+										"No esta habilitado en este turno para conectarse al parquimetro",
 										"Ingreso invalido",
 										JOptionPane.ERROR_MESSAGE);
-								LP.removeAllElements();
 							}
 						}else {
-							//cancelo todo porque esta fuera de horario
-							btnIngresarPatente.setEnabled(true);
-							btnParquimetro.setEnabled(false);
 							JOptionPane.showMessageDialog(null,
 									"Esta fuera del horario de trabajo",
 									"Ingreso invalido",
 									JOptionPane.ERROR_MESSAGE);
 						}
-							
-					
 					} catch (SQLException ex) {
 						salidaError(ex);
 					} catch (NullPointerException ex2){
@@ -417,13 +410,22 @@ public class VenInspector extends JFrame{
 			}
 		});
 		
-		btnCancelar.addActionListener(new ActionListener() {
+		btnReiniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//vuelvo a empezar
 				btnIngresarPatente.setEnabled(true);
+				btnIngresarParquimetro.setEnabled(false);
 				btnParquimetro.setEnabled(false);
+				btnPatente.setEnabled(false);
+				tfPatente.setEnabled(false);
+				boxParquimetro.removeAllItems();
+				boxNumero.removeAllItems();
+				boxUbicacion.removeAllItems();
+				boxUbicacion.setEnabled(false);
+				boxNumero.setEnabled(false);
+				boxParquimetro.setEnabled(false);
 				LP.removeAllElements();
-				tabla.cleanup();
+				tabla.clearSelection();
 			}
 		});
 		
@@ -488,6 +490,7 @@ public class VenInspector extends JFrame{
 	}
 	
 	private void generarYMostrarMultas(Statement st,ResultSet rs) throws SQLException{
+		
 		//crear multas
 		for(int i=0;i<LP.size();i++) {
 			patente=LP.getElementAt(i);
@@ -501,7 +504,6 @@ public class VenInspector extends JFrame{
 			}
 			rs.close();
 		}
-		LP.removeAllElements();
 		
 		//mostrar multas
 		txtConsulta="SELECT numero,fecha,hora,calle,altura,patente,legajo FROM Multa NATURAL JOIN Asociado_con "+
