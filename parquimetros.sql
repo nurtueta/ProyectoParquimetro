@@ -184,6 +184,15 @@ CREATE TABLE Multa (
     ON DELETE RESTRICT ON UPDATE CASCADE
  
 ) ENGINE=InnoDB;
+
+CREATE TABLE Ventas(
+
+ id_tarjeta INT UNSIGNED AUTO_INCREMENT NOT NULL,
+ saldo DECIMAL(5,2) NOT NULL,
+ tipo VARCHAR(30) NOT NULL,
+ fecha DATE NOT NULL,
+ hora TIME NOT NULL,
+)
 #-------------------------------------------------------------------------
 # Creación de vistas 
 
@@ -215,6 +224,27 @@ CREATE TABLE Multa (
 	GRANT SELECT ON parquimetros.Automoviles TO inspector@'%';
 	GRANT INSERT ON parquimetros.Multa TO inspector@'%';	
 	GRANT INSERT ON parquimetros.Accede TO inspector@'%';
+
+
+	CREATE USER parquimetro@'%' IDENTIFIED BY 'parquimetro';
+	GRANT SELECT ON parquimetros.parquimetros TO parquimetros@'%';
+	GRANT SELECT ON parquimetros.Estacionamientos TO parquimetros@'%';
+	GRANT INSERT ON parquimetros.Estacionamientos TO parquimetros@'%';					#MODIFIQUE ACAAAAAAA MODIFIQUE ACA
+	GRANT execute ON PROCEDURE parquimetros.conectar TO parquimetros@'%';
+
+
+	delimiter !
+	CREATE TRIGGER ventas_update
+	AFTER INSERT ON Tarjetas
+	BEGIN
+	INSERT INTO ventas(id_tarjeta, tipo,
+	saldo,fecha, hora)
+	VALUES(NEW.id_tarjeta, NEW.tipo, NEW.saldo,
+	curdate(), curtime();
+	END; !
+	delimiter ;
+
+
 #-------------------------------------------------------------------------
 # Creacion de Stored Procedures
 delimiter !
