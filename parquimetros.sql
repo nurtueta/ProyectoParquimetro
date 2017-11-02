@@ -186,13 +186,30 @@ CREATE TABLE Multa (
 ) ENGINE=InnoDB;
 
 CREATE TABLE Ventas(
-
+ id_venta INT UNSIGNED AUTO_INCREMENT NOT NULL,
  id_tarjeta INT UNSIGNED AUTO_INCREMENT NOT NULL,
  saldo DECIMAL(5,2) NOT NULL,
  tipo VARCHAR(30) NOT NULL,
  fecha DATE NOT NULL,
  hora TIME NOT NULL,
-)
+
+ CONSTRAINT pk_Ventas
+ PRIMARY KEY (id_venta),
+
+ CONSTRAINT FK_Tarjetas_venta
+ FOREIGN KEY(id_tarjeta) REFERENCES Tarjetas (id_tarjeta)
+ ON DELETE RESTRICT ON UPDATE CASCADE
+
+ CONSTRAINT FK_Tarjetas_venta
+ FOREIGN KEY(saldo) REFERENCES Tarjetas (saldo)
+ ON DELETE RESTRICT ON UPDATE CASCADE
+
+ CONSTRAINT FK_Tarjetas_venta
+ FOREIGN KEY(tipo) REFERENCES Tarjetas (tipo)
+ ON DELETE RESTRICT ON UPDATE CASCADE
+
+)ENGINE=InnoDB;
+
 #-------------------------------------------------------------------------
 # Creación de vistas 
 
@@ -237,10 +254,9 @@ CREATE TABLE Ventas(
 	CREATE TRIGGER ventas_update
 	AFTER INSERT ON Tarjetas
 	BEGIN
-	INSERT INTO ventas(id_tarjeta, tipo,
-	saldo,fecha, hora)
+	INSERT INTO ventas
 	VALUES(NEW.id_tarjeta, NEW.tipo, NEW.saldo,
-	curdate(), curtime();
+	curdate(), curtime());
 	END; !
 	delimiter ;
 
