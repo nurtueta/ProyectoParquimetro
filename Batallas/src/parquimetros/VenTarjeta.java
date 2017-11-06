@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JTextField;
 
 public class VenTarjeta extends JFrame{
 	
@@ -47,6 +48,7 @@ public class VenTarjeta extends JFrame{
 	private JButton btnIngresar;
 	
 	private String txtConsulta;
+	private JTextField textField;
 	
 	public VenTarjeta() 
 	{
@@ -199,18 +201,9 @@ public class VenTarjeta extends JFrame{
 							id_parquimetro=Integer.parseInt(rs.getString(1));
 							rs.close();
 							//ejecuto el procedimiento
-							rs = st.executeQuery("CALL conectar("+id_tarjeta+","+id_parquimetro+");");
-							if(rs.first()) {
-								int i=rs.getMetaData().getColumnCount();
-								for(int x=1;x<=i;x++) {
-									System.out.println(rs.getMetaData().getColumnName(x));
-									System.out.println(rs.getString(x));
-								}
-								
-							}
-							//obtener datos devueltos
-							
-							//mostrar datos devueltos
+							txtConsulta="CALL conectar("+id_tarjeta+","+id_parquimetro+");";
+							refrescarTabla();
+
 						}
 						
 						
@@ -246,8 +239,8 @@ public class VenTarjeta extends JFrame{
 
 	private void crearTabla() {
 		tabla = new DBTable();
-		tabla.setBounds(35, 250, 500, 300);
-		//getContentPane().add(tabla);           
+		tabla.setBounds(30, 194, 400, 50);
+		getContentPane().add(tabla);           
 		tabla.setEditable(false);       
 	}
 	
@@ -290,22 +283,10 @@ public class VenTarjeta extends JFrame{
 		try{    
 			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
 			tabla.setSelectSql(this.txtConsulta);
-
-			// obtenemos el modelo de la tabla a partir de la consulta para 
-			// modificar la forma en que se muestran de algunas columnas  
-			tabla.createColumnModelFromQuery();    	    
-			for (int i = 0; i < tabla.getColumnCount(); i++){ 
-				// para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-				if	 (tabla.getColumn(i).getType()==Types.TIME) {    		 
-					tabla.getColumn(i).setType(Types.CHAR);  
-				}
-				// cambiar el formato en que se muestran los valores de tipo DATE
-				if	 (tabla.getColumn(i).getType()==Types.DATE){
-					tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
-				}
-			}  
+			
 			// actualizamos el contenido de la tabla.   	     	  
 			tabla.refresh();
+			
 			// No es necesario establecer  una conexión, crear una sentencia y recuperar el 
 			// resultado en un resultSet, esto lo hace automáticamente la tabla (DBTable) a 
 			// patir  de  la conexión y la consulta seteadas con connectDatabase() y setSelectSql() respectivamente.
