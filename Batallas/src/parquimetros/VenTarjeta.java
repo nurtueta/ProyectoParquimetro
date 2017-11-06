@@ -283,10 +283,22 @@ public class VenTarjeta extends JFrame{
 		try{    
 			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
 			tabla.setSelectSql(this.txtConsulta);
-			
+
+			// obtenemos el modelo de la tabla a partir de la consulta para 
+			// modificar la forma en que se muestran de algunas columnas  
+			tabla.createColumnModelFromQuery();    	    
+			for (int i = 0; i < tabla.getColumnCount(); i++){ 
+				// para que muestre correctamente los valores de tipo TIME (hora)  		   		  
+				if	 (tabla.getColumn(i).getType()==Types.TIME) {    		 
+					tabla.getColumn(i).setType(Types.CHAR);  
+				}
+				// cambiar el formato en que se muestran los valores de tipo DATE
+				if	 (tabla.getColumn(i).getType()==Types.DATE){
+					tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
+				}
+			}  
 			// actualizamos el contenido de la tabla.   	     	  
 			tabla.refresh();
-			
 			// No es necesario establecer  una conexión, crear una sentencia y recuperar el 
 			// resultado en un resultSet, esto lo hace automáticamente la tabla (DBTable) a 
 			// patir  de  la conexión y la consulta seteadas con connectDatabase() y setSelectSql() respectivamente.

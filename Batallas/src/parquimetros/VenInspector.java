@@ -195,7 +195,7 @@ public class VenInspector extends JFrame{
 	private void crearTabla() {
 		tabla = new DBTable();
 		tabla.setBounds(35, 250, 500, 300);
-		//getContentPane().add(tabla);           
+		getContentPane().add(tabla);           
 		tabla.setEditable(false);       
 	}
 
