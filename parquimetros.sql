@@ -357,6 +357,7 @@ delimiter ;
 	CREATE USER parquimetro@'%' IDENTIFIED BY 'parq';
 	GRANT SELECT ON parquimetros.Parquimetros TO parquimetro@'%';
 	GRANT SELECT ON parquimetros.Estacionamientos TO parquimetro@'%';
+	GRANT SELECT ON parquimetros.Tarjetas TO parquimetro@'%';
 	GRANT INSERT ON parquimetros.Estacionamientos TO parquimetro@'%';
 	GRANT execute ON PROCEDURE parquimetros.conectar TO parquimetro@'%';
 
