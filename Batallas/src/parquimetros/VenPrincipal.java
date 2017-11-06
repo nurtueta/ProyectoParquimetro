@@ -33,6 +33,7 @@ public class VenPrincipal {
 	private JTextField userBox;
 	private JPasswordField pwdBox;
 	protected Connection conexionBD = null;
+	private JButton btnTarjeta;
 	
 
 
@@ -202,6 +203,17 @@ public class VenPrincipal {
 		textPane.setBounds(18, 84, 46, 20);
 		textPane.setFocusable(false);
 		frmParquimetroLandauurtuetavazquez.getContentPane().add(textPane);
+		
+		btnTarjeta = new JButton("Tarjeta");
+		btnTarjeta.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				VenTarjeta ventanaTarjeta = new VenTarjeta();
+//	           	ventanaTarjeta.setVisible(true);
+	           	frmParquimetroLandauurtuetavazquez.setVisible(false);
+			}
+		});
+		btnTarjeta.setBounds(143, 213, 114, 25);
+		frmParquimetroLandauurtuetavazquez.getContentPane().add(btnTarjeta);
 	}
 	
 	
