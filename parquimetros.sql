@@ -6,7 +6,7 @@ CREATE DATABASE parquimetros;
 USE parquimetros;
 
 #-------------------------------------------------------------------------
-# Creaci贸n Tablas para las entidades
+# Creaci髇 Tablas para las entidades
 
 CREATE TABLE Conductores (
  dni INT UNSIGNED NOT NULL,
@@ -96,6 +96,8 @@ CREATE TABLE Parquimetros (
  FOREIGN KEY (calle,altura) REFERENCES Ubicaciones (calle,altura)
 	ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+#-------------------------------------------------------------------------
+# Creaci髇 Tablas para las relaciones
 
 CREATE TABLE Estacionamientos (
  id_tarjeta INT UNSIGNED NOT NULL,
@@ -116,9 +118,7 @@ CREATE TABLE Estacionamientos (
  FOREIGN KEY (id_parq) REFERENCES Parquimetros (id_parq)
 	ON DELETE RESTRICT ON UPDATE CASCADE
 
-) ENGINE=InnoDB; 
-#-------------------------------------------------------------------------
-# Creaci贸n Tablas para las relaciones
+) ENGINE=InnoDB;
 
 CREATE TABLE Accede (
  legajo INT UNSIGNED NOT NULL,
@@ -184,23 +184,160 @@ CREATE TABLE Multa (
     ON DELETE RESTRICT ON UPDATE CASCADE
  
 ) ENGINE=InnoDB;
-#-------------------------------------------------------------------------
-# Creaci贸n de vistas 
 
-   CREATE VIEW estacionados AS
+CREATE TABLE Ventas(
+ id_tarjeta INT UNSIGNED NOT NULL,
+ saldo DECIMAL(5,2) NOT NULL,
+ tipo_tarjeta VARCHAR(30) NOT NULL,
+ fecha DATE NOT NULL,
+ hora TIME NOT NULL,
+
+ CONSTRAINT pk_Ventas
+ PRIMARY KEY (id_tarjeta)
+
+)ENGINE=InnoDB;
+
+#-------------------------------------------------------------------------
+# Creaci髇 de vistas 
+
+   CREATE VIEW estacionados as
    SELECT patente, calle, altura 
    FROM (Tarjetas JOIN Parquimetros JOIN Estacionamientos 
    ON Parquimetros.id_parq = Estacionamientos.id_parq AND Tarjetas.id_tarjeta = Estacionamientos.id_tarjeta)
    WHERE fecha_sal IS NULL;
 #-------------------------------------------------------------------------
-# Creaci贸n de usuarios y otorgamiento de privilegios
+# Creacion de Stored Procedures
+delimiter !
+	CREATE PROCEDURE conectar(IN id_tarjeta INTEGER, IN id_parquimetro INTEGER)
+		BEGIN
+			DECLARE ntarjetas INTEGER UNSIGNED;
+			DECLARE nestacionados INTEGER;
+			DECLARE EXIT HANDLER FOR SQLEXCEPTION
+				BEGIN
+					SELECT 'SQLEXCEPTION!, transaccion abortada' AS resultado;
+					ROLLBACK;
+				END;
+			START TRANSACTION;
+				SET ntarjetas = (SELECT COUNT(*) FROM Tarjetas WHERE Tarjetas.id_tarjeta = id_tarjeta LOCK IN SHARE MODE);
+				IF ntarjetas = 0 THEN
+					SELECT 'N/A' AS operacion, 'error' AS resultado, 'no existe la tarjeta' AS causa;
+				ELSE
+					SET nestacionados = (SELECT COUNT(*) FROM estacionados JOIN Tarjetas 
+						ON estacionados.patente = Tarjetas.patente WHERE Tarjetas.id_tarjeta = id_tarjeta LOCK IN SHARE MODE);
+					IF nestacionados = 0 THEN 
+						CALL apertura(id_tarjeta, id_parquimetro);
+					ELSE
+						CALL cierre(id_tarjeta, id_parquimetro);
+					END IF;
+				END IF;
+			COMMIT;
+		END; !
+
+	CREATE PROCEDURE apertura(IN id_tarjeta INTEGER , in id_parq INTEGER)
+		BEGIN
+			DECLARE sal DECIMAL(5,2);
+			DECLARE tar DECIMAL(5,2) UNSIGNED;
+			DECLARE tiempo INTEGER UNSIGNED;
+			DECLARE des DECIMAL(3,2) UNSIGNED;
+			DECLARE nparquimetros INTEGER UNSIGNED;
+			DECLARE EXIT HANDLER FOR SQLEXCEPTION
+				BEGIN
+					SELECT 'SQLEXCEPTION!, transaccion abortada' AS resultado;
+					ROLLBACK;
+				END;
+			START TRANSACTION;
+				SET nparquimetros = (SELECT COUNT(*) FROM Parquimetros WHERE Parquimetros.id_parq = id_parq LOCK IN SHARE MODE);
+				IF nparquimetros = 0 THEN
+					SELECT 'apertura' AS operacion, 'error' AS resultado, 'parquimetro inexistente' AS causa;
+				ELSE
+					SELECT descuento INTO des FROM (Tipos_tarjeta JOIN Tarjetas ON 
+						Tipos_tarjeta.tipo = Tarjetas.tipo) WHERE 
+						Tarjetas.id_tarjeta = id_tarjeta LIMIT 1 LOCK IN SHARE MODE;
+					IF des = 1.00 THEN
+						INSERT INTO Estacionamientos VALUES (id_tarjeta, id_parq, curdate(), curtime(), NULL, NULL);
+						SELECT 'apertura' AS operacion, 'exito' AS resultado, 'inf' AS tiempo;
+					ELSE
+						SELECT saldo INTO sal FROM Tarjetas WHERE Tarjetas.id_tarjeta = id_tarjeta LIMIT 1 LOCK IN SHARE MODE;
+						IF sal>0 THEN
+							INSERT INTO Estacionamientos VALUES (id_tarjeta, id_parq, curdate(), curtime(), NULL, NULL);
+							SELECT tarifa INTO tar FROM (Ubicaciones JOIN Parquimetros 
+								ON Ubicaciones.calle = Parquimetros.calle 
+								AND Ubicaciones.altura = Parquimetros.altura) 
+								WHERE Parquimetros.id_parq = id_parq LIMIT 1 LOCK IN SHARE MODE;
+							SET tiempo = sal/(tar*(1-des));
+							SELECT 'apertura' AS operacion, 'exito' AS resultado, CONCAT(tiempo,' min.') AS tiempo;				
+						ELSE
+							SELECT 'apertura' AS operacion, 'error' AS resultado, 'sin saldo' AS causa;
+						END IF;
+					END IF;
+				END IF;
+			COMMIT;
+		END; !
+
+	CREATE PROCEDURE cierre(IN id_tarjeta INTEGER , in id_parq INTEGER)
+		BEGIN
+			DECLARE nparquimetros INTEGER UNSIGNED;
+			DECLARE tiempo INTEGER UNSIGNED;
+			DECLARE fent DATE;
+			DECLARE hent TIME;	
+			DECLARE vsaldo DECIMAL(5,2);
+			DECLARE nsaldo DECIMAL(5,2);
+			DECLARE tar DECIMAL(5,2) UNSIGNED;
+			DECLARE des DECIMAL(3,2) UNSIGNED;
+			DECLARE EXIT HANDLER FOR SQLEXCEPTION
+				BEGIN
+					SELECT 'SQLEXCEPTION!, transaccion abortada' AS resultado;
+					ROLLBACK;
+				END;
+			START TRANSACTION;
+				SET nparquimetros = (SELECT COUNT(*) FROM Parquimetros WHERE Parquimetros.id_parq = id_parq LOCK IN SHARE MODE);
+				IF nparquimetros = 0 THEN
+					SELECT 'cierre' AS operacion, 'error' AS resultado, 'parquimetro inexistente' AS causa;
+				ELSE
+					SELECT fecha_ent INTO fent FROM Estacionamientos 
+						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LOCK IN SHARE MODE; 
+					SELECT hora_ent INTO hent FROM Estacionamientos 
+						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LOCK IN SHARE MODE;
+					SET tiempo = datediff(curdate(), fent)*24*60+time_to_sec(timediff(curtime(),hent))/60;
+					UPDATE Estacionamientos SET fecha_sal=curdate(), hora_sal=curtime() 
+						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL;
+					SELECT descuento INTO des FROM (Tipos_tarjeta JOIN Tarjetas 
+						ON Tipos_tarjeta.tipo = Tarjetas.tipo) 
+						WHERE Tarjetas.id_tarjeta = id_tarjeta LIMIT 1 LOCK IN SHARE MODE;
+					IF des<1 THEN
+						SELECT saldo INTO vsaldo FROM Tarjetas where Tarjetas.id_tarjeta = id_tarjeta FOR UPDATE;
+						SELECT tarifa INTO tar FROM (Ubicaciones JOIN Parquimetros 
+							ON Ubicaciones.calle = Parquimetros.calle 
+							AND Ubicaciones.altura = Parquimetros.altura) 
+							WHERE Parquimetros.id_parq = id_parq LIMIT 1 LOCK IN SHARE MODE;
+						SET nsaldo = vsaldo - tiempo*(tar*(1-des));
+						UPDATE Tarjetas SET saldo = nsaldo where Tarjetas.id_tarjeta = id_tarjeta;
+					END IF;
+					SELECT saldo INTO nsaldo FROM Tarjetas where Tarjetas.id_tarjeta = id_tarjeta LOCK IN SHARE MODE;
+					SELECT 'cierre' AS operacion, 'exito' AS resultado, nsaldo AS saldo;
+				END IF;
+			COMMIT;
+		END; !
+delimiter ;
+#-------------------------------------------------------------------------
+# Creacion de triggers
+	delimiter !
+	CREATE TRIGGER venta_update
+	AFTER INSERT ON Tarjetas
+	FOR EACH ROW
+	BEGIN
+		INSERT INTO Ventas(id_tarjeta, saldo, tipo_tarjeta, fecha, hora) values(new.id_tarjeta, new.saldo, new.tipo, curdate(), curtime());
+	END; !
+	delimiter ;
+#-------------------------------------------------------------------------
+# Creaci髇 de usuarios y otorgamiento de privilegios
 
 	CREATE USER admin@localhost IDENTIFIED BY 'admin';	
 	GRANT ALL PRIVILEGES ON parquimetros.* TO admin@localhost WITH GRANT OPTION;
 	GRANT CREATE USER ON *.* TO admin@localhost;
 
 	CREATE USER venta@'%' IDENTIFIED BY 'venta';	
-    	GRANT INSERT ON parquimetros.Tarjetas TO venta@'%';
+    GRANT INSERT ON parquimetros.Tarjetas TO venta@'%';
 	GRANT SELECT ON parquimetros.Automoviles To venta@'%';
 	GRANT SELECT ON parquimetros.Tipos_tarjeta To venta@'%';
 	GRANT SELECT ON parquimetros.Tarjetas To venta@'%';
@@ -215,5 +352,14 @@ CREATE TABLE Multa (
 	GRANT SELECT ON parquimetros.Automoviles TO inspector@'%';
 	GRANT INSERT ON parquimetros.Multa TO inspector@'%';	
 	GRANT INSERT ON parquimetros.Accede TO inspector@'%';
+
+
+	CREATE USER parquimetro@'%' IDENTIFIED BY 'parq';
+	GRANT SELECT ON parquimetros.Parquimetros TO parquimetro@'%';
+	GRANT SELECT ON parquimetros.Estacionamientos TO parquimetro@'%';
+	GRANT INSERT ON parquimetros.Estacionamientos TO parquimetro@'%';
+	GRANT execute ON PROCEDURE parquimetros.conectar TO parquimetro@'%';
+
+
 #-------------------------------------------------------------------------
 #fin
