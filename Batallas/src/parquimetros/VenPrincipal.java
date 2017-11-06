@@ -232,7 +232,7 @@ public class VenPrincipal {
 		btnTarjeta.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				VenTarjeta ventanaTarjeta = new VenTarjeta();
-//	           	ventanaTarjeta.setVisible(true);
+	           	ventanaTarjeta.setVisible(true);
 	           	frmParquimetroLandauurtuetavazquez.setVisible(false);
 			}
 		});

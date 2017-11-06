@@ -200,6 +200,14 @@ public class VenTarjeta extends JFrame{
 							rs.close();
 							//ejecuto el procedimiento
 							rs = st.executeQuery("CALL conectar("+id_tarjeta+","+id_parquimetro+");");
+							if(rs.first()) {
+								int i=rs.getMetaData().getColumnCount();
+								for(int x=1;x<=i;x++) {
+									System.out.println(rs.getMetaData().getColumnName(x));
+									System.out.println(rs.getString(x));
+								}
+								
+							}
 							//obtener datos devueltos
 							
 							//mostrar datos devueltos
