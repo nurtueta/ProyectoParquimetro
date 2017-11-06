@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Vector;
@@ -16,12 +17,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
+import com.mysql.jdbc.Statement;
+
 import quick.dbtable.DBTable;
 import javax.swing.JLabel;
 import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class VenTarjeta extends JFrame{
-
 	
 	private DBTable tabla;
 	
@@ -30,15 +34,17 @@ public class VenTarjeta extends JFrame{
 	private JComboBox boxParquimetro;
 	private JComboBox boxTarjetas;
 	
-	private JList<String> listaPatente;
-	private DefaultListModel<String> LP;
-	
 	private Vector<String> ubicaciones;
 	private Vector<Integer> numeros;
 	private Vector<Integer> parquimetros;
 	private Vector<Integer> tarjetas;
 	
-	private JScrollPane scrollPane;
+	private JLabel lblCalle;
+	private JLabel lblNumero;
+	private JLabel lblParquimetro;
+	private JLabel lblTarjeta;
+	
+	private JButton btnIngresar;
 	
 	private String txtConsulta;
 	
@@ -59,69 +65,182 @@ public class VenTarjeta extends JFrame{
 		getContentPane().setLayout(null);
 		
 		crearTabla();
-		crearOtros();
+		conectarBD();
+		crearBox();
+		crearLabel();
+		crearBoton();
+		crearOyente();
+		
+		try {
+			Statement st = (Statement) tabla.getConnection().createStatement();
+			ResultSet rs=st.executeQuery("SELECT calle FROM Parquimetros GROUP BY calle;");
+			while(rs.next()){
+				boxUbicacion.addItem(rs.getString(1));
+			}
+			rs.close();
+			
+			rs=st.executeQuery("SELECT id_tarjeta FROM Tarjetas ORDER BY id_tarjeta ;");
+			while(rs.next()) {
+				boxTarjetas.addItem(rs.getInt(1));
+			}
+			rs.close();
+			
+		} catch (SQLException ex) {
+			salidaError(ex);;
+		}
+		
 	}
 	
-	private void crearOtros() {
-		LP = new DefaultListModel<String>();
-		listaPatente = new JList<String>(LP);
-		
-		scrollPane = new JScrollPane(listaPatente);
-		scrollPane.setBounds(578, 11, 167, 325);
-		getContentPane().add(scrollPane);
+	private void crearBox() {
 		
 		ubicaciones=new Vector<String>();
 		boxUbicacion = new JComboBox(ubicaciones);
-		boxUbicacion.setEnabled(false);
-		boxUbicacion.setBounds(135, 47, 124, 24);
+		boxUbicacion.setBounds(135, 30, 124, 24);
 		getContentPane().add(boxUbicacion);
 		
 		numeros=new Vector<Integer>();
 		boxNumero = new JComboBox(numeros);
-		boxNumero.setEnabled(false);
-		boxNumero.setBounds(135, 79, 124, 24);
+		boxNumero.setBounds(135, 60, 124, 24);
 		getContentPane().add(boxNumero);
 		
 		parquimetros=new Vector<Integer>();
 		boxParquimetro = new JComboBox(parquimetros);
-		boxParquimetro.setEnabled(false);
-		boxParquimetro.setBounds(135, 111, 124, 25);
+		boxParquimetro.setBounds(135, 90, 124, 25);
 		getContentPane().add(boxParquimetro);
 		
 		tarjetas=new Vector<Integer>();
 		boxTarjetas = new JComboBox(tarjetas);
-		boxTarjetas.setEnabled(false);
-		boxTarjetas.setBounds(135, 111, 124, 25);
+		boxTarjetas.setBounds(135, 120, 124, 25);
 		getContentPane().add(boxTarjetas);
-		
-		JLabel lblCalle = new JLabel("Calle");
-		lblCalle.setBounds(31, 47, 66, 15);
-		getContentPane().add(lblCalle);
-		
-		JLabel lblNumero = new JLabel("Numero");
-		lblNumero.setBounds(31, 84, 66, 15);
-		getContentPane().add(lblNumero);
-		
-		JLabel lblParquimetro = new JLabel("Parquimetro");
-		lblParquimetro.setBounds(31, 116, 102, 15);
-		getContentPane().add(lblParquimetro);
-		
-		JLabel lblSeleccionarUbicacion = new JLabel("Seleccionar ubicacion");
-		lblSeleccionarUbicacion.setBounds(135, 13, 191, 15);
-		getContentPane().add(lblSeleccionarUbicacion);
-		
-		JButton btnIngresarTarjeta = new JButton("Ingresar Tarjeta");
-		btnIngresarTarjeta.setBounds(112, 149, 191, 25);
-		getContentPane().add(btnIngresarTarjeta);
-		
 	}
 	
+	private void crearLabel() {
+		lblCalle = new JLabel("Calle");
+		lblCalle.setBounds(30, 35, 66, 15);
+		getContentPane().add(lblCalle);
+		
+		lblNumero = new JLabel("Numero");
+		lblNumero.setBounds(30, 65, 66, 15);
+		getContentPane().add(lblNumero);
+		
+		lblParquimetro = new JLabel("Parquimetro");
+		lblParquimetro.setBounds(30, 95, 102, 15);
+		getContentPane().add(lblParquimetro);
+		
+		lblTarjeta = new JLabel("Tarjeta");
+		lblTarjeta.setBounds(30, 125, 66, 15);
+		getContentPane().add(lblTarjeta);
+	}
+	
+	private void crearBoton() {
+		btnIngresar = new JButton("Ingresar");
+		btnIngresar.setBounds(115, 157, 179, 25);
+		getContentPane().add(btnIngresar);	
+	}
+	
+	private void crearOyente() {
+		boxUbicacion.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boxParquimetro.removeAllItems();
+				boxNumero.removeAllItems();
+				try {
+					Statement st = (Statement) tabla.getConnection().createStatement();
+					ResultSet rs=st.executeQuery("SELECT altura FROM Parquimetros WHERE calle='"+
+							boxUbicacion.getSelectedItem()+"' GROUP BY altura ;");
+					while(rs.next()){
+						boxNumero.addItem(Integer.parseInt(rs.getString(1)));
+					}
+					boxNumero.setSelectedItem(null);
+				} catch (SQLException ex) {
+					salidaError(ex);
+				}
+			}
+		});
+		
+		boxNumero.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boxParquimetro.removeAllItems();
+				try {
+					Statement st = (Statement) tabla.getConnection().createStatement();
+					ResultSet rs=st.executeQuery("SELECT numero FROM Parquimetros WHERE calle='"+
+							boxUbicacion.getSelectedItem()+"' AND altura="+boxNumero.getSelectedItem()+";");
+					while(rs.next()){
+						boxParquimetro.addItem(Integer.parseInt(rs.getString(1)));
+					}
+					boxParquimetro.setSelectedItem(null);
+				} catch (SQLException ex) {
+					salidaError(ex);
+				}
+			}
+		});
+		
+		btnIngresar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(boxParquimetro.getSelectedItem()==null || boxNumero.getSelectedItem()==null)
+					JOptionPane.showMessageDialog(null,
+							"Faltan ingresar datos",
+							"Ingreso invalido",
+							JOptionPane.ERROR_MESSAGE);
+				else {	
+					String calle=(String) boxUbicacion.getSelectedItem();
+					int parquimetro= (Integer) boxParquimetro.getSelectedItem();
+					int numero= (Integer) boxNumero.getSelectedItem();
+					int id_tarjeta=(Integer) boxTarjetas.getSelectedItem();
+					int id_parquimetro;
+					Statement st = null;
+					ResultSet rs = null;
+					try {
+						
+						//obtengo id_parq 
+						st = (Statement) tabla.getConnection().createStatement();
+						rs = st.executeQuery("SELECT id_parq FROM Parquimetros WHERE numero="+parquimetro+" AND"+
+								" calle='"+calle+"' AND altura="+numero+" ;");
+						if(rs.first()) {
+							id_parquimetro=Integer.parseInt(rs.getString(1));
+							rs.close();
+							//ejecuto el procedimiento
+							rs = st.executeQuery("CALL conectar("+id_tarjeta+","+id_parquimetro+");");
+							//obtener datos devueltos
+							
+							//mostrar datos devueltos
+						}
+						
+						
+					} catch (SQLException ex) {
+						salidaError(ex);
+					} catch (NullPointerException ex2){
+						JOptionPane.showMessageDialog(null,
+								"Error",
+								"Error",
+								JOptionPane.ERROR_MESSAGE);
+					}
+					finally {					
+						if(st != null) {
+							try {
+								st.close();
+							} catch (SQLException ex) {
+								salidaError(ex);
+							}
+						}
+						if(rs != null) {
+							try {
+								rs.close();
+							} catch (SQLException ex) {
+								salidaError(ex);
+							}
+						}
+					}
+					
+				}
+			}
+		});
+	}
 
 	private void crearTabla() {
 		tabla = new DBTable();
 		tabla.setBounds(35, 250, 500, 300);
 		//getContentPane().add(tabla);           
-		//tabla.setEditable(false);       
+		tabla.setEditable(false);       
 	}
 	
 	private void conectarBD(){
@@ -132,7 +251,7 @@ public class VenTarjeta extends JFrame{
 			String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos;
 
 			//establece una conexión con la  B.D. "parquimetros"  usando directamante una tabla DBTable    
-			tabla.connectDatabase(driver, uriConexion, "inspector", "inspector");
+			tabla.connectDatabase(driver, uriConexion, "parquimetro", "parq");
 		}
 		catch (SQLException ex){
 			JOptionPane.showMessageDialog(this,
