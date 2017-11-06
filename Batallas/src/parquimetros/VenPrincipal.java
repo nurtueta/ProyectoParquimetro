@@ -33,8 +33,12 @@ public class VenPrincipal {
 	private JTextField userBox;
 	private JPasswordField pwdBox;
 	protected Connection conexionBD = null;
+
+
+
 	private JButton btnTarjeta;
 	
+
 
 
 	/**
@@ -72,10 +76,10 @@ public class VenPrincipal {
 		frmParquimetroLandauurtuetavazquez.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent arg0) {
-				
+
 				try {
 					if(conexionBD!=null)
-					conexionBD.close();
+						conexionBD.close();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					JOptionPane.showMessageDialog(null, "hubo error al cerrar todo");
@@ -85,26 +89,39 @@ public class VenPrincipal {
 		frmParquimetroLandauurtuetavazquez.setBounds(100, 100, 450, 300);
 		frmParquimetroLandauurtuetavazquez.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmParquimetroLandauurtuetavazquez.getContentPane().setLayout(null);
-		
+
 		JButton btnLogin = new JButton("Login");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				
+
+
 				String usuario = userBox.getText();
 				String password =new String(pwdBox.getPassword());
-	            String baseDatos = "parquimetros";					// NO ESTOY SEGURO SI ES DATOS O PARQUIMETROS
+				String baseDatos = "parquimetros";					// NO ESTOY SEGURO SI ES DATOS O PARQUIMETROS
 
-	            
-	            try {
-				
-	            	String uriConexion = "jdbc:mysql://" + "localhost:3306" + "/" + baseDatos;
 
-	            	/*
-	            	 * Si el usuario ingresado es ADMIN
-	            	 */
-					if(usuario.equals("admin") && password.equals("admin")) {
-							
+				try {
+
+					String uriConexion = "jdbc:mysql://" + "localhost:3306" + "/" + baseDatos;
+
+					/*
+					 * Si el usuario ingresado es ADMIN
+					 */
+					if(usuario.equals("admin")) {
+						try {
+							conexionBD = DriverManager.getConnection(uriConexion, usuario, password);
+						} catch (SQLException e) {
+							if(e.getSQLState().equals("28000")) {
+								JOptionPane.showMessageDialog(null,
+										"Contraseña incorrecta",
+										"Error",
+										JOptionPane.ERROR_MESSAGE);
+							}
+							System.out.println("SQLException: " + e.getMessage());
+							System.out.println("SQLState: " + e.getSQLState());
+							System.out.println("VendorError: " + e.getErrorCode());
+						}
+
 						VenConsultas ventanaAdmin = new VenConsultas();
 						ventanaAdmin.setVisible(true);
 						frmParquimetroLandauurtuetavazquez.setVisible(false);
@@ -114,51 +131,58 @@ public class VenPrincipal {
 					 * Si el usuario ingresado es el legajo de un inspector valido
 					 */
 					else {
-							
-							conexionBD = DriverManager.getConnection(uriConexion, "inspector", "inspector");
-							Statement stmt = conexionBD.createStatement();
-					        String queryString = "SELECT * FROM Inspectores where legajo = "+usuario+" AND password = md5('"+password+"')";
 
-					        ResultSet results = stmt.executeQuery(queryString);
-					        if (results.first()) {
-					        	String user= results.getString(1);
-					        	conexionBD.close();
-					        	
-					           	VenInspector ventanaInspector = new VenInspector(usuario);
-					           	ventanaInspector.setVisible(true);
-					           	frmParquimetroLandauurtuetavazquez.setVisible(false);
+						conexionBD = DriverManager.getConnection(uriConexion, "inspector", "inspector");
+						Statement stmt = conexionBD.createStatement();
+						String queryString = "SELECT * FROM Inspectores where legajo = "+usuario+" AND password = md5('"+password+"')";
 
-					        }
-					        else {
-					           	   JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
-					        }
-					        results.close();
+						ResultSet results = stmt.executeQuery(queryString);
+						if (results.first()) {
+							String user= results.getString(1);
+							conexionBD.close();
+
+							VenInspector ventanaInspector = new VenInspector(usuario);
+							ventanaInspector.setVisible(true);
+							frmParquimetroLandauurtuetavazquez.setVisible(false);
+
+						}
+						else {
+							JOptionPane.showMessageDialog(null, "Please Check Username and Password ");
+						}
+						results.close();
 					}
-							
+
 				}catch (SQLException e) {
 
-			        JOptionPane.showMessageDialog(null, "An Error ocurred trying to connect to the DATABASE");
-			    } 
-		    } 
+					JOptionPane.showMessageDialog(null,
+							"Se produjo un error al intentar conectarse a la base de datos.\n" + e.getMessage(),
+							"Error",
+							JOptionPane.ERROR_MESSAGE);
+					System.out.println("SQLException: " + e.getMessage());
+					System.out.println("SQLState: " + e.getSQLState());
+					System.out.println("VendorError: " + e.getErrorCode());
+
+				} 
+			} 
 		});
 		btnLogin.setBounds(261, 109, 89, 23);
 		frmParquimetroLandauurtuetavazquez.getContentPane().add(btnLogin);
-		
+
 		userBox = new JTextField();
 		userBox.setForeground(new Color(153, 153, 102));
 		userBox.setText("Usuario");
 		userBox.setBounds(82, 84, 86, 20);
 		frmParquimetroLandauurtuetavazquez.getContentPane().add(userBox);
 		userBox.setColumns(10);
-		
+
 		pwdBox = new JPasswordField("contrasena");
 		pwdBox.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent arg0) {
-				
-				
-				
-				
+
+
+
+
 				/*
 				 * 
 				 * 
@@ -169,34 +193,34 @@ public class VenPrincipal {
 		pwdBox.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent arg0) {
-				
+
 				pwdBox.setText("");
-				
+
 			}
 		});
-		
+
 		userBox.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent arg0) {
-				
+
 				userBox.setText("");
-				
+
 			}
 		});
-		
+
 		pwdBox.setEchoChar('*');
 		pwdBox.setToolTipText("Contrase\u00F1a");
 		pwdBox.setBounds(82, 133, 86, 20);
 		frmParquimetroLandauurtuetavazquez.getContentPane().add(pwdBox);
 		pwdBox.setColumns(10);
-		
+
 		JTextPane txtpnUsuario = new JTextPane();
 		txtpnUsuario.setBackground(new Color(255, 255, 153));
 		txtpnUsuario.setText("Contrasena:");
 		txtpnUsuario.setBounds(10, 133, 64, 20);
 		txtpnUsuario.setFocusable(false);
 		frmParquimetroLandauurtuetavazquez.getContentPane().add(txtpnUsuario);
-		
+
 		JTextPane textPane = new JTextPane();
 		textPane.setBackground(new Color(255, 255, 153));
 		textPane.setText("Usuario:");
@@ -215,40 +239,40 @@ public class VenPrincipal {
 		btnTarjeta.setBounds(143, 213, 114, 25);
 		frmParquimetroLandauurtuetavazquez.getContentPane().add(btnTarjeta);
 	}
-	
-	
+
+
 	private void conectarBD()
-	   {
-	      if (this.conexionBD == null)
-	      {
-	        
-	    	  try
-	         {
-	            Class.forName("com.mysql.jdbc.Driver").newInstance();
-	         }
-	         catch (Exception ex)
-	         {
-	            System.out.println(ex.getMessage());
-	         }
-	        
-	         try
-	         {
-	            String servidor = "localhost:3306";
-	            String baseDatos = "parquimetros";
-	            String usuario = userBox.getText();
-	            String clave = pwdBox.getPassword().toString();
-	            String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos;
-	   
-	            this.conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
-	         }
-	         catch (SQLException ex)
-	         {
-	        	
-	            JOptionPane.showMessageDialog(null,
-	                                          "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
-	                                          "Error",
-	                                          JOptionPane.ERROR_MESSAGE);
-	         }
-	      }
-	   }
+	{
+		if (this.conexionBD == null)
+		{
+
+			try
+			{
+				Class.forName("com.mysql.jdbc.Driver").newInstance();
+			}
+			catch (Exception ex)
+			{
+				System.out.println(ex.getMessage());
+			}
+
+			try
+			{
+				String servidor = "localhost:3306";
+				String baseDatos = "parquimetros";
+				String usuario = userBox.getText();
+				String clave = pwdBox.getPassword().toString();
+				String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos;
+
+				this.conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
+			}
+			catch (SQLException ex)
+			{
+
+				JOptionPane.showMessageDialog(null,
+						"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
+						"Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
 }
