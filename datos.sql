@@ -53,11 +53,11 @@ INSERT INTO Inspectores VALUES (3444, 3444444444, 'Pedro', 'Villar', md5('Correc
 INSERT INTO Inspectores VALUES (3555, 3555555555, 'Manuel', 'Acosta', md5('correct'));
 INSERT INTO Inspectores VALUES (3666, 3666666666, 'Pepe', 'Landas', md5(''));
 
-INSERT INTO Ubicaciones VALUES ('c1', 0, 999.99);
-INSERT INTO Ubicaciones VALUES ('c2', 5, 75.00);
-INSERT INTO Ubicaciones VALUES ('c3', 10, 400.99);
-INSERT INTO Ubicaciones VALUES ('c4', 15, 50.00);
-INSERT INTO Ubicaciones VALUES ('c5', 120, 00.00);
+INSERT INTO Ubicaciones VALUES ('c1', 0, 9.99);
+INSERT INTO Ubicaciones VALUES ('c2', 5, 5.00);
+INSERT INTO Ubicaciones VALUES ('c3', 10, 10.99);
+INSERT INTO Ubicaciones VALUES ('c4', 15, 1.00);
+INSERT INTO Ubicaciones VALUES ('c5', 120, 3.00);
 
 INSERT INTO Parquimetros VALUES (4111, 1, 'c1', 0);
 INSERT INTO Parquimetros VALUES (4222, 2, 'c2', 5);
