@@ -6,7 +6,7 @@ CREATE DATABASE parquimetros;
 USE parquimetros;
 
 #-------------------------------------------------------------------------
-# Creaci贸n Tablas para las entidades
+# Creaci髇 Tablas para las entidades
 
 CREATE TABLE Conductores (
  dni INT UNSIGNED NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE Parquimetros (
 	ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 #-------------------------------------------------------------------------
-# Creaci贸n Tablas para las relaciones
+# Creaci髇 Tablas para las relaciones
 
 CREATE TABLE Estacionamientos (
  id_tarjeta INT UNSIGNED NOT NULL,
@@ -186,81 +186,25 @@ CREATE TABLE Multa (
 ) ENGINE=InnoDB;
 
 CREATE TABLE Ventas(
- id_venta INT UNSIGNED AUTO_INCREMENT NOT NULL,
- id_tarjeta INT UNSIGNED AUTO_INCREMENT NOT NULL,
+ id_tarjeta INT UNSIGNED NOT NULL,
  saldo DECIMAL(5,2) NOT NULL,
- tipo VARCHAR(30) NOT NULL,
+ tipo_tarjeta VARCHAR(30) NOT NULL,
  fecha DATE NOT NULL,
  hora TIME NOT NULL,
 
  CONSTRAINT pk_Ventas
- PRIMARY KEY (id_venta),
-
- CONSTRAINT FK_Tarjetas_venta
- FOREIGN KEY(id_tarjeta) REFERENCES Tarjetas (id_tarjeta)
- ON DELETE RESTRICT ON UPDATE CASCADE
-
- CONSTRAINT FK_Tarjetas_venta
- FOREIGN KEY(saldo) REFERENCES Tarjetas (saldo)
- ON DELETE RESTRICT ON UPDATE CASCADE
-
- CONSTRAINT FK_Tarjetas_venta
- FOREIGN KEY(tipo) REFERENCES Tarjetas (tipo)
- ON DELETE RESTRICT ON UPDATE CASCADE
+ PRIMARY KEY (id_tarjeta)
 
 )ENGINE=InnoDB;
 
 #-------------------------------------------------------------------------
-# Creaci贸n de vistas 
+# Creaci髇 de vistas 
 
    CREATE VIEW estacionados as
    SELECT patente, calle, altura 
    FROM (Tarjetas JOIN Parquimetros JOIN Estacionamientos 
    ON Parquimetros.id_parq = Estacionamientos.id_parq AND Tarjetas.id_tarjeta = Estacionamientos.id_tarjeta)
    WHERE fecha_sal IS NULL;
-#-------------------------------------------------------------------------
-# Creaci贸n de usuarios y otorgamiento de privilegios
-
-	CREATE USER admin@localhost IDENTIFIED BY 'admin';	
-	GRANT ALL PRIVILEGES ON parquimetros.* TO admin@localhost WITH GRANT OPTION;
-	GRANT CREATE USER ON *.* TO admin@localhost;
-
-	CREATE USER venta@'%' IDENTIFIED BY 'venta';	
-    GRANT INSERT ON parquimetros.Tarjetas TO venta@'%';
-	GRANT SELECT ON parquimetros.Automoviles To venta@'%';
-	GRANT SELECT ON parquimetros.Tipos_tarjeta To venta@'%';
-	GRANT SELECT ON parquimetros.Tarjetas To venta@'%';
-	
-	CREATE USER inspector@'%' IDENTIFIED BY 'inspector';	
-	GRANT SELECT ON parquimetros.Inspectores TO inspector@'%';	
-	GRANT SELECT ON parquimetros.estacionados TO inspector@'%';
-	GRANT SELECT ON parquimetros.Multa TO inspector@'%';
-	GRANT SELECT ON parquimetros.Accede TO inspector@'%';
-	GRANT SELECT ON parquimetros.Parquimetros TO inspector@'%';
-	GRANT SELECT ON parquimetros.Asociado_con TO inspector@'%';
-	GRANT SELECT ON parquimetros.Automoviles TO inspector@'%';
-	GRANT INSERT ON parquimetros.Multa TO inspector@'%';	
-	GRANT INSERT ON parquimetros.Accede TO inspector@'%';
-
-
-	CREATE USER parquimetro@'%' IDENTIFIED BY 'parquimetro';
-	GRANT SELECT ON parquimetros.parquimetros TO parquimetros@'%';
-	GRANT SELECT ON parquimetros.Estacionamientos TO parquimetros@'%';
-	GRANT INSERT ON parquimetros.Estacionamientos TO parquimetros@'%';					#MODIFIQUE ACAAAAAAA MODIFIQUE ACA
-	GRANT execute ON PROCEDURE parquimetros.conectar TO parquimetros@'%';
-
-
-	delimiter !
-	CREATE TRIGGER ventas_update
-	AFTER INSERT ON Tarjetas
-	BEGIN
-	INSERT INTO ventas
-	VALUES(NEW.id_tarjeta, NEW.tipo, NEW.saldo,
-	curdate(), curtime());
-	END; !
-	delimiter ;
-
-
 #-------------------------------------------------------------------------
 # Creacion de Stored Procedures
 delimiter !
@@ -375,5 +319,47 @@ delimiter !
 			COMMIT;
 		END; !
 delimiter ;
+#-------------------------------------------------------------------------
+# Creacion de triggers
+	delimiter !
+	CREATE TRIGGER venta_update
+	AFTER INSERT ON tarjetas
+	FOR EACH ROW
+	BEGIN
+		INSERT INTO ventas(id_tarjeta, saldo, tipo_tarjeta, fecha, hora) values(new.id_tarjeta, new.saldo, new.tipo, curdate(), curtime());
+	END; !
+	delimiter ;
+#-------------------------------------------------------------------------
+# Creaci髇 de usuarios y otorgamiento de privilegios
+
+	CREATE USER admin@localhost IDENTIFIED BY 'admin';	
+	GRANT ALL PRIVILEGES ON parquimetros.* TO admin@localhost WITH GRANT OPTION;
+	GRANT CREATE USER ON *.* TO admin@localhost;
+
+	CREATE USER venta@'%' IDENTIFIED BY 'venta';	
+    GRANT INSERT ON parquimetros.Tarjetas TO venta@'%';
+	GRANT SELECT ON parquimetros.Automoviles To venta@'%';
+	GRANT SELECT ON parquimetros.Tipos_tarjeta To venta@'%';
+	GRANT SELECT ON parquimetros.Tarjetas To venta@'%';
+	
+	CREATE USER inspector@'%' IDENTIFIED BY 'inspector';	
+	GRANT SELECT ON parquimetros.Inspectores TO inspector@'%';	
+	GRANT SELECT ON parquimetros.estacionados TO inspector@'%';
+	GRANT SELECT ON parquimetros.Multa TO inspector@'%';
+	GRANT SELECT ON parquimetros.Accede TO inspector@'%';
+	GRANT SELECT ON parquimetros.Parquimetros TO inspector@'%';
+	GRANT SELECT ON parquimetros.Asociado_con TO inspector@'%';
+	GRANT SELECT ON parquimetros.Automoviles TO inspector@'%';
+	GRANT INSERT ON parquimetros.Multa TO inspector@'%';	
+	GRANT INSERT ON parquimetros.Accede TO inspector@'%';
+
+
+	CREATE USER parquimetro@'%' IDENTIFIED BY 'parq';
+	GRANT SELECT ON parquimetros.parquimetros TO parquimetro@'%';
+	GRANT SELECT ON parquimetros.Estacionamientos TO parquimetro@'%';
+	GRANT INSERT ON parquimetros.Estacionamientos TO parquimetro@'%';
+	GRANT execute ON PROCEDURE parquimetros.conectar TO parquimetro@'%';
+
+
 #-------------------------------------------------------------------------
 #fin
