@@ -29,13 +29,7 @@ public class VenPrincipal {
 	private JTextField userBox;
 	private JPasswordField pwdBox;
 	protected Connection conexionBD = null;
-
-
-
 	private JButton btnTarjeta;
-	
-
-
 
 	/**
 	 * Launch the application.
@@ -105,6 +99,10 @@ public class VenPrincipal {
 					if(usuario.equals("admin")) {
 						try {
 							conexionBD = DriverManager.getConnection(uriConexion, usuario, password);
+							conexionBD.close();
+							VenConsultas ventanaAdmin = new VenConsultas(usuario,password);
+							ventanaAdmin.setVisible(true);
+							frmParquimetroLandauurtuetavazquez.setVisible(false);
 						} catch (SQLException e) {
 							if(e.getSQLState().equals("28000")) {
 								JOptionPane.showMessageDialog(null,
@@ -116,10 +114,7 @@ public class VenPrincipal {
 							System.out.println("SQLState: " + e.getSQLState());
 							System.out.println("VendorError: " + e.getErrorCode());
 						}
-
-						VenConsultas ventanaAdmin = new VenConsultas();
-						ventanaAdmin.setVisible(true);
-						frmParquimetroLandauurtuetavazquez.setVisible(false);
+						
 
 					}
 					/*
@@ -133,8 +128,8 @@ public class VenPrincipal {
 
 						ResultSet results = stmt.executeQuery(queryString);
 						if (results.first()) {
+							
 							conexionBD.close();
-
 							VenInspector ventanaInspector = new VenInspector(usuario);
 							ventanaInspector.setVisible(true);
 							frmParquimetroLandauurtuetavazquez.setVisible(false);
@@ -174,13 +169,6 @@ public class VenPrincipal {
 			@Override
 			public void keyTyped(KeyEvent arg0) {
 
-
-
-
-				/*
-				 * 
-				 * 
-				 */
 			}
 		});
 		pwdBox.setForeground(new Color(153, 153, 102));

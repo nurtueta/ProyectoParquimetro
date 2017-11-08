@@ -49,12 +49,12 @@ public class VenConsultas extends javax.swing.JFrame
 
 	private String usuario;
 	private String clave;
-	public VenConsultas() 
+	public VenConsultas(String usuario, String clave) 
 	{
 		super();
 		getContentPane().setBackground(new Color(255, 153, 102));
-		usuario = "admin";
-		clave = "admin";
+		this.usuario = usuario;
+		this.clave = clave;
 		initGUI();
 	}
 
