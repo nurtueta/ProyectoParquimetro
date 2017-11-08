@@ -1,8 +1,6 @@
 package parquimetros;
 
 import java.awt.EventQueue;
-import java.awt.Window;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
@@ -11,12 +9,10 @@ import javax.swing.JTextField;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.awt.event.ActionEvent;
-import quick.dbtable.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.FocusAdapter;
@@ -81,7 +77,6 @@ public class VenPrincipal {
 					if(conexionBD!=null)
 						conexionBD.close();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					JOptionPane.showMessageDialog(null, "hubo error al cerrar todo");
 				}
 			}
@@ -138,7 +133,6 @@ public class VenPrincipal {
 
 						ResultSet results = stmt.executeQuery(queryString);
 						if (results.first()) {
-							String user= results.getString(1);
 							conexionBD.close();
 
 							VenInspector ventanaInspector = new VenInspector(usuario);
@@ -238,41 +232,5 @@ public class VenPrincipal {
 		});
 		btnTarjeta.setBounds(143, 213, 114, 25);
 		frmParquimetroLandauurtuetavazquez.getContentPane().add(btnTarjeta);
-	}
-
-
-	private void conectarBD()
-	{
-		if (this.conexionBD == null)
-		{
-
-			try
-			{
-				Class.forName("com.mysql.jdbc.Driver").newInstance();
-			}
-			catch (Exception ex)
-			{
-				System.out.println(ex.getMessage());
-			}
-
-			try
-			{
-				String servidor = "localhost:3306";
-				String baseDatos = "parquimetros";
-				String usuario = userBox.getText();
-				String clave = pwdBox.getPassword().toString();
-				String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos;
-
-				this.conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
-			}
-			catch (SQLException ex)
-			{
-
-				JOptionPane.showMessageDialog(null,
-						"Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
-						"Error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		}
 	}
 }

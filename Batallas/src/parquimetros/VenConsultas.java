@@ -1,22 +1,16 @@
 package parquimetros;
 
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.sql.Types;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -37,9 +31,7 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.event.ListSelectionEvent;
-import java.awt.Color;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon; 
+import java.awt.Color; 
 
 @SuppressWarnings("serial")
 public class VenConsultas extends javax.swing.JFrame 
@@ -57,9 +49,6 @@ public class VenConsultas extends javax.swing.JFrame
 
 	private String usuario;
 	private String clave;
-	private JPanel btnAtras;
-
-
 	public VenConsultas() 
 	{
 		super();
@@ -389,7 +378,6 @@ public class VenConsultas extends javax.swing.JFrame
 					JOptionPane.ERROR_MESSAGE);
 
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
