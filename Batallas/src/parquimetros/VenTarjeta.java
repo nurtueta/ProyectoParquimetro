@@ -288,9 +288,13 @@ public class VenTarjeta extends JFrame{
 	private synchronized void refrescarTabla(){
 		try{    
 			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
+<<<<<<< HEAD
 
 			tabla.setSelectSql(this.txtConsulta);
 
+=======
+			tabla.setSelectSql(this.txtConsulta); 
+>>>>>>> 659d52f7a5bdb856d97678b490d43af5f8971409
 			// actualizamos el contenido de la tabla.   	     	  
 			tabla.refresh();
 			// No es necesario establecer  una conexión, crear una sentencia y recuperar el 

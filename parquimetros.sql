@@ -6,7 +6,7 @@ CREATE DATABASE parquimetros;
 USE parquimetros;
 
 #-------------------------------------------------------------------------
-# Creaci髇 Tablas para las entidades
+# Creaci贸n Tablas para las entidades
 
 CREATE TABLE Conductores (
  dni INT UNSIGNED NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE Parquimetros (
 	ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 #-------------------------------------------------------------------------
-# Creaci髇 Tablas para las relaciones
+# Creaci贸n Tablas para las relaciones
 
 CREATE TABLE Estacionamientos (
  id_tarjeta INT UNSIGNED NOT NULL,
@@ -198,7 +198,7 @@ CREATE TABLE Ventas(
 )ENGINE=InnoDB;
 
 #-------------------------------------------------------------------------
-# Creaci髇 de vistas 
+# Creaci贸n de vistas 
 
    CREATE VIEW estacionados as
    SELECT patente, calle, altura 
@@ -310,7 +310,11 @@ delimiter !
 							ON Ubicaciones.calle = Parquimetros.calle 
 							AND Ubicaciones.altura = Parquimetros.altura) 
 							WHERE Parquimetros.id_parq = id_parq LIMIT 1 LOCK IN SHARE MODE;
-						SET nsaldo = vsaldo - tiempo*(tar*(1-des));
+						IF (vsaldo - tiempo*(tar*(1-des))) < -999.99 THEN
+							SET nsaldo = -999.99;
+						ELSE
+							SET nsaldo = (vsaldo - tiempo*(tar*(1-des)));
+						END IF;
 						UPDATE Tarjetas SET saldo = nsaldo where Tarjetas.id_tarjeta = id_tarjeta;
 					END IF;
 					SELECT saldo INTO nsaldo FROM Tarjetas where Tarjetas.id_tarjeta = id_tarjeta LOCK IN SHARE MODE;
@@ -330,7 +334,7 @@ delimiter ;
 	END; !
 	delimiter ;
 #-------------------------------------------------------------------------
-# Creaci髇 de usuarios y otorgamiento de privilegios
+# Creaci贸n de usuarios y otorgamiento de privilegios
 
 	CREATE USER admin@localhost IDENTIFIED BY 'admin';	
 	GRANT ALL PRIVILEGES ON parquimetros.* TO admin@localhost WITH GRANT OPTION;
