@@ -1,43 +1,35 @@
 package parquimetros;
 
 import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.Vector;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.JTable;
 
 import com.mysql.jdbc.Statement;
 
-import quick.dbtable.DBTable;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
 
+@SuppressWarnings("serial")
 public class VenTarjeta extends JFrame{
 	
-	private DBTable tabla;
-	
+	private JTable tabla;
+	   
 	protected Connection conexionBD = null;
 	
-	private JComboBox boxUbicacion;
-	private JComboBox boxNumero;
-	private JComboBox boxParquimetro;
-	private JComboBox boxTarjetas;
+	private JComboBox<String> boxUbicacion;
+	private JComboBox<Integer> boxNumero;
+	private JComboBox<Integer> boxParquimetro;
+	private JComboBox<Integer> boxTarjetas;
 	
 	private Vector<String> ubicaciones;
 	private Vector<Integer> numeros;
@@ -52,7 +44,6 @@ public class VenTarjeta extends JFrame{
 	private JButton btnIngresar;
 	
 	private String txtConsulta;
-	private JTextField textField;
 	
 	public VenTarjeta() 
 	{
@@ -78,7 +69,7 @@ public class VenTarjeta extends JFrame{
 		crearOyente();
 		
 		try {
-			Statement st = (Statement) tabla.getConnection().createStatement();
+	        Statement st = (Statement) this.conexionBD.createStatement();
 			ResultSet rs=st.executeQuery("SELECT calle FROM Parquimetros GROUP BY calle;");
 			while(rs.next()){
 				boxUbicacion.addItem(rs.getString(1));
@@ -90,6 +81,7 @@ public class VenTarjeta extends JFrame{
 				boxTarjetas.addItem(rs.getInt(1));
 			}
 			rs.close();
+			st.close();
 			
 		} catch (SQLException ex) {
 			salidaError(ex);;
@@ -100,22 +92,22 @@ public class VenTarjeta extends JFrame{
 	private void crearBox() {
 		
 		ubicaciones=new Vector<String>();
-		boxUbicacion = new JComboBox(ubicaciones);
+		boxUbicacion = new JComboBox<String>(ubicaciones);
 		boxUbicacion.setBounds(135, 30, 124, 24);
 		getContentPane().add(boxUbicacion);
 		
 		numeros=new Vector<Integer>();
-		boxNumero = new JComboBox(numeros);
+		boxNumero = new JComboBox<Integer>(numeros);
 		boxNumero.setBounds(135, 60, 124, 24);
 		getContentPane().add(boxNumero);
 		
 		parquimetros=new Vector<Integer>();
-		boxParquimetro = new JComboBox(parquimetros);
+		boxParquimetro = new JComboBox<Integer>(parquimetros);
 		boxParquimetro.setBounds(135, 90, 124, 25);
 		getContentPane().add(boxParquimetro);
 		
 		tarjetas=new Vector<Integer>();
-		boxTarjetas = new JComboBox(tarjetas);
+		boxTarjetas = new JComboBox<Integer>(tarjetas);
 		boxTarjetas.setBounds(135, 120, 124, 25);
 		getContentPane().add(boxTarjetas);
 	}
@@ -150,13 +142,15 @@ public class VenTarjeta extends JFrame{
 				boxParquimetro.removeAllItems();
 				boxNumero.removeAllItems();
 				try {
-					Statement st = (Statement) tabla.getConnection().createStatement();
+					Statement st = (Statement) conexionBD.createStatement();
 					ResultSet rs=st.executeQuery("SELECT altura FROM Parquimetros WHERE calle='"+
 							boxUbicacion.getSelectedItem()+"' GROUP BY altura ;");
 					while(rs.next()){
 						boxNumero.addItem(Integer.parseInt(rs.getString(1)));
 					}
 					boxNumero.setSelectedItem(null);
+					rs.close();
+					st.close();
 				} catch (SQLException ex) {
 					salidaError(ex);
 				}
@@ -167,13 +161,15 @@ public class VenTarjeta extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				boxParquimetro.removeAllItems();
 				try {
-					Statement st = (Statement) tabla.getConnection().createStatement();
+					Statement st = (Statement) conexionBD.createStatement();
 					ResultSet rs=st.executeQuery("SELECT numero FROM Parquimetros WHERE calle='"+
 							boxUbicacion.getSelectedItem()+"' AND altura="+boxNumero.getSelectedItem()+";");
 					while(rs.next()){
 						boxParquimetro.addItem(Integer.parseInt(rs.getString(1)));
 					}
 					boxParquimetro.setSelectedItem(null);
+					rs.close();
+					st.close();
 				} catch (SQLException ex) {
 					salidaError(ex);
 				}
@@ -198,16 +194,15 @@ public class VenTarjeta extends JFrame{
 					try {
 						
 						//obtengo id_parq 
-						st = (Statement) tabla.getConnection().createStatement();
+						st = (Statement) conexionBD.createStatement();
 						rs = st.executeQuery("SELECT id_parq FROM Parquimetros WHERE numero="+parquimetro+" AND"+
 								" calle='"+calle+"' AND altura="+numero+" ;");
 						if(rs.first()) {
 							id_parquimetro=Integer.parseInt(rs.getString(1));
-							rs.close();
+							
 							//ejecuto el procedimiento
 							txtConsulta="CALL conectar("+id_tarjeta+","+id_parquimetro+");";
 							refrescarTabla();
-
 						}
 						
 						
@@ -242,23 +237,18 @@ public class VenTarjeta extends JFrame{
 	}
 
 	private void crearTabla() {
-		tabla = new DBTable();
-		tabla.setBounds(30, 194, 400, 50);
-		tabla.setSize(400, 60);
-		tabla.getTable().setAutoCreateColumnsFromModel(false);
+		tabla = new JTable(2,3);
+		tabla.setBounds(12, 206, 400, 30);
 		getContentPane().add(tabla);           
-		tabla.setEditable(false);       
 	}
 	
 	private void conectarBD(){
 		try{
-			String driver ="com.mysql.jdbc.Driver";
 			String servidor = "localhost:3306";
 			String baseDatos = "parquimetros";
 			String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos;
 
-			//establece una conexión con la  B.D. "parquimetros"  usando directamante una tabla DBTable    
-			tabla.connectDatabase(driver, uriConexion, "parquimetro", "parq");
+			this.conexionBD = DriverManager.getConnection(uriConexion, "parquimetro" , "parq");
 		}
 		catch (SQLException ex){
 			JOptionPane.showMessageDialog(this,
@@ -269,47 +259,35 @@ public class VenTarjeta extends JFrame{
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
 		}
-		catch (ClassNotFoundException e){			
-			e.printStackTrace();
-		}
 	}
 
-	private void desconectarBD(){
+	 private void refrescarTabla(){
 		try{
-			tabla.close();            
-		}
-		catch (SQLException ex){
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
-		}      
-	}
-
-	private synchronized void refrescarTabla(){
-		try{    
-			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
-<<<<<<< HEAD
-
-			tabla.setSelectSql(this.txtConsulta);
-
-=======
-			tabla.setSelectSql(this.txtConsulta); 
->>>>>>> 659d52f7a5bdb856d97678b490d43af5f8971409
-			// actualizamos el contenido de la tabla.   	     	  
-			tabla.refresh();
-			// No es necesario establecer  una conexión, crear una sentencia y recuperar el 
-			// resultado en un resultSet, esto lo hace automáticamente la tabla (DBTable) a 
-			// patir  de  la conexión y la consulta seteadas con connectDatabase() y setSelectSql() respectivamente.
-		}
-		catch (SQLException ex){
-			// en caso de error, se muestra la causa en la consola
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
-			JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
-					ex.getMessage() + "\n", 
-					"Error al ejecutar la consulta.",
-					JOptionPane.ERROR_MESSAGE);
+			// se crea una sentencia o comando jdbc para realizar la consulta 
+			// a partir de la coneccion establecida (conexionBD)
+			Statement stmt = (Statement) this.conexionBD.createStatement();
+			
+			// se ejecuta la sentencia y se recibe un resultset
+			ResultSet rs = stmt.executeQuery(txtConsulta);
+			
+			// se recorre el resulset y se actualiza la tabla en pantalla
+			if(rs.first()){
+				tabla.setValueAt(rs.getMetaData().getColumnName(1), 0, 0);
+				tabla.setValueAt(rs.getMetaData().getColumnName(2), 0, 1);
+				tabla.setValueAt(rs.getMetaData().getColumnName(3), 0, 2);
+				
+				tabla.setValueAt(rs.getString(1), 1 , 0 );
+				tabla.setValueAt(rs.getString(2), 1 , 1);            
+				tabla.setValueAt(rs.getString(3), 1 , 2);	
+			}
+			rs.close();
+			stmt.close();	
+			 // se cierran los recursos utilizados 
+		}catch (SQLException ex){
+	         // en caso de error, se muestra la causa en la consola
+	         System.out.println("SQLException: " + ex.getMessage());
+	         System.out.println("SQLState: " + ex.getSQLState());
+	         System.out.println("VendorError: " + ex.getErrorCode());
 		}
 	}
 	

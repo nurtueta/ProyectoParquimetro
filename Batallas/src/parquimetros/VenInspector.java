@@ -21,7 +21,6 @@ import java.awt.event.WindowEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.LinkedList;
 import java.util.Vector;
 import java.awt.event.ActionEvent;
 import javax.swing.JList;
@@ -40,9 +39,9 @@ public class VenInspector extends JFrame{
 	private JButton btnReiniciar;
 	private JButton btnAtras;
 	
-	private JComboBox boxUbicacion;
-	private JComboBox boxNumero;
-	private JComboBox boxParquimetro;
+	private JComboBox<String> boxUbicacion;
+	private JComboBox<Integer> boxNumero;
+	private JComboBox<Integer> boxParquimetro;
 	
 	private JTextField tfPatente;
 	
@@ -116,19 +115,19 @@ public class VenInspector extends JFrame{
 		getContentPane().add(scrollPane);
 		
 		ubicaciones=new Vector<String>();
-		boxUbicacion = new JComboBox(ubicaciones);
+		boxUbicacion = new JComboBox<String>(ubicaciones);
 		boxUbicacion.setEnabled(false);
 		boxUbicacion.setBounds(135, 86, 124, 24);
 		getContentPane().add(boxUbicacion);
 		
 		numeros=new Vector<Integer>();
-		boxNumero = new JComboBox(numeros);
+		boxNumero = new JComboBox<Integer>(numeros);
 		boxNumero.setEnabled(false);
 		boxNumero.setBounds(135, 118, 124, 24);
 		getContentPane().add(boxNumero);
 		
 		parquimetros=new Vector<Integer>();
-		boxParquimetro = new JComboBox(parquimetros);
+		boxParquimetro = new JComboBox<Integer>(parquimetros);
 		boxParquimetro.setEnabled(false);
 		boxParquimetro.setBounds(135, 150, 124, 25);
 		getContentPane().add(boxParquimetro);
