@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -16,6 +17,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 
 import com.mysql.jdbc.Statement;
 
@@ -29,6 +31,8 @@ import javax.swing.JTextField;
 public class VenTarjeta extends JFrame{
 	
 	private DBTable tabla;
+	
+	protected Connection conexionBD = null;
 	
 	private JComboBox boxUbicacion;
 	private JComboBox boxNumero;
@@ -240,6 +244,8 @@ public class VenTarjeta extends JFrame{
 	private void crearTabla() {
 		tabla = new DBTable();
 		tabla.setBounds(30, 194, 400, 50);
+		tabla.setSize(400, 60);
+		tabla.getTable().setAutoCreateColumnsFromModel(false);
 		getContentPane().add(tabla);           
 		tabla.setEditable(false);       
 	}
@@ -279,24 +285,12 @@ public class VenTarjeta extends JFrame{
 		}      
 	}
 
-	private void refrescarTabla(){
+	private synchronized void refrescarTabla(){
 		try{    
 			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
+
 			tabla.setSelectSql(this.txtConsulta);
 
-			// obtenemos el modelo de la tabla a partir de la consulta para 
-			// modificar la forma en que se muestran de algunas columnas  
-			tabla.createColumnModelFromQuery();    	    
-			for (int i = 0; i < tabla.getColumnCount(); i++){ 
-				// para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-				if	 (tabla.getColumn(i).getType()==Types.TIME) {    		 
-					tabla.getColumn(i).setType(Types.CHAR);  
-				}
-				// cambiar el formato en que se muestran los valores de tipo DATE
-				if	 (tabla.getColumn(i).getType()==Types.DATE){
-					tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
-				}
-			}  
 			// actualizamos el contenido de la tabla.   	     	  
 			tabla.refresh();
 			// No es necesario establecer  una conexión, crear una sentencia y recuperar el 
