@@ -261,7 +261,7 @@ public class VenTarjeta extends JFrame{
 		}
 	}
 
-	 private void refrescarTabla(){
+	 private synchronized void refrescarTabla(){
 		try{
 			// se crea una sentencia o comando jdbc para realizar la consulta 
 			// a partir de la coneccion establecida (conexionBD)
@@ -274,7 +274,7 @@ public class VenTarjeta extends JFrame{
 			if(rs.first()){
 				tabla.setValueAt(rs.getMetaData().getColumnName(1), 0, 0);
 				tabla.setValueAt(rs.getMetaData().getColumnName(2), 0, 1);
-				tabla.setValueAt(rs.getMetaData().getColumnName(3), 0, 2);
+				tabla.setValueAt("saldo", 0, 2);
 				
 				tabla.setValueAt(rs.getString(1), 1 , 0 );
 				tabla.setValueAt(rs.getString(2), 1 , 1);            
