@@ -132,8 +132,8 @@ public class VenTarjeta extends JFrame{
 	
 	private void crearBoton() {
 		btnIngresar = new JButton("Ingresar");
-		btnIngresar.setBounds(115, 157, 179, 25);
-		getContentPane().add(btnIngresar);	
+		btnIngresar.setBounds(101, 157, 179, 25);
+		getContentPane().add(btnIngresar);
 	}
 	
 	private void crearOyente() {
@@ -237,8 +237,9 @@ public class VenTarjeta extends JFrame{
 	}
 
 	private void crearTabla() {
-		tabla = new JTable(2,3);
-		tabla.setBounds(12, 206, 400, 30);
+		tabla = new JTable(3,2);
+		tabla.setRowSelectionAllowed(false);
+		tabla.setBounds(12, 206, 400, 45);
 		getContentPane().add(tabla);           
 	}
 	
@@ -272,13 +273,18 @@ public class VenTarjeta extends JFrame{
 			
 			// se recorre el resulset y se actualiza la tabla en pantalla
 			if(rs.first()){
-				tabla.setValueAt(rs.getMetaData().getColumnName(1), 0, 0);
-				tabla.setValueAt(rs.getMetaData().getColumnName(2), 0, 1);
-				tabla.setValueAt("saldo", 0, 2);
-				
-				tabla.setValueAt(rs.getString(1), 1 , 0 );
-				tabla.setValueAt(rs.getString(2), 1 , 1);            
-				tabla.setValueAt(rs.getString(3), 1 , 2);	
+				if(rs.getMetaData().getColumnCount()==1) {
+					tabla.setValueAt(rs.getMetaData().getColumnName(1), 0, 0);
+					tabla.setValueAt(rs.getString(1), 0, 1);
+				}else {
+					tabla.setValueAt(rs.getMetaData().getColumnName(1), 0, 0);
+					tabla.setValueAt(rs.getMetaData().getColumnName(2), 1, 0);
+					tabla.setValueAt("saldo", 2, 0);
+					
+					tabla.setValueAt(rs.getString(1), 0 , 1 );
+					tabla.setValueAt(rs.getString(2), 1 , 1);            
+					tabla.setValueAt(rs.getString(3), 2 , 1);
+				}
 			}
 			rs.close();
 			stmt.close();	
