@@ -53,11 +53,11 @@ INSERT INTO Inspectores VALUES (3444, 3444444444, 'Pedro', 'Villar', md5('Correc
 INSERT INTO Inspectores VALUES (3555, 3555555555, 'Manuel', 'Acosta', md5('correct'));
 INSERT INTO Inspectores VALUES (3666, 3666666666, 'Pepe', 'Landas', md5(''));
 
-INSERT INTO Ubicaciones VALUES ('c1', 0, 9.99);
-INSERT INTO Ubicaciones VALUES ('c2', 5, 5.00);
-INSERT INTO Ubicaciones VALUES ('c3', 10, 10.99);
-INSERT INTO Ubicaciones VALUES ('c4', 15, 1.00);
-INSERT INTO Ubicaciones VALUES ('c5', 120, 3.00);
+INSERT INTO Ubicaciones VALUES ('c1', 0, 1.00);
+INSERT INTO Ubicaciones VALUES ('c2', 5, 2.00);
+INSERT INTO Ubicaciones VALUES ('c3', 10, 0.50);
+INSERT INTO Ubicaciones VALUES ('c4', 15, 0.75);
+INSERT INTO Ubicaciones VALUES ('c5', 120, 1.50);
 
 INSERT INTO Parquimetros VALUES (4111, 1, 'c1', 0);
 INSERT INTO Parquimetros VALUES (4222, 2, 'c2', 5);
@@ -68,17 +68,17 @@ INSERT INTO Parquimetros VALUES (4666, 6, 'c1', 0);
 INSERT INTO Parquimetros VALUES (4777, 7, 'c3', 10);
 
 #ubicacion c1
-INSERT INTO Estacionamientos VALUES (1, 4111, '2017-9-11', '07:55:36', NULL, NULL);
-INSERT INTO Estacionamientos VALUES (6, 4444, '2017-9-11', '11:05:44', NULL, NULL);
-INSERT INTO Estacionamientos VALUES (10, 4777, '2017-9-11', '13:16:53', NULL, NULL);
-INSERT INTO Estacionamientos VALUES (8, 4777, '2017-9-12', '13:17:53', NULL, NULL);
-INSERT INTO Estacionamientos VALUES (3, 4777, '2017-9-12', '13:18:53', NULL, NULL);
+INSERT INTO Estacionamientos VALUES (1, 4111, curdate(), subtime(curtime(),'00:05:00'), NULL, NULL);
+INSERT INTO Estacionamientos VALUES (6, 4444, curdate(), subtime(curtime(),'00:30:00'), NULL, NULL);
+INSERT INTO Estacionamientos VALUES (10, 4777, curdate(), subtime(curtime(),'01:00:00'), NULL, NULL);
+INSERT INTO Estacionamientos VALUES (8, 4777, curdate(), subtime(curtime(),'02:00:00'), NULL, NULL);
+INSERT INTO Estacionamientos VALUES (3, 4777, curdate(), subtime(curtime(),'03:00:00'), NULL, NULL);
 
 #ubicacion con 1 parquimetro, todos libres
 INSERT INTO Estacionamientos VALUES (5, 4222, '2017-9-11', '13:30:25', '2017-9-11', '14:24:12');
 
 #ubicacion con 2 parquimetros, 1 libre y 1 vacio
-INSERT INTO Estacionamientos VALUES (2, 4333, '2017-9-11', '14:00:01', NULL, NULL);
+INSERT INTO Estacionamientos VALUES (2, 4333, curdate(), subtime(curtime(),'10:00:00'), NULL, NULL);
 INSERT INTO Estacionamientos VALUES (3, 4777, '2017-9-11', '13:15:53', '2017-9-11', '15:10:00');
 INSERT INTO Estacionamientos VALUES (4, 4777, '2017-9-11', '15:30:25', '2017-9-11', '15:35:00');
 
