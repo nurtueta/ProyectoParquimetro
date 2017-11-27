@@ -279,7 +279,7 @@ public class VenTarjeta extends JFrame{
 				}else {
 					tabla.setValueAt(rs.getMetaData().getColumnName(1), 0, 0);
 					tabla.setValueAt(rs.getMetaData().getColumnName(2), 1, 0);
-					tabla.setValueAt("saldo", 2, 0);
+					tabla.setValueAt(rs.getMetaData().getColumnName(3), 2, 0);
 					
 					tabla.setValueAt(rs.getString(1), 0 , 1 );
 					tabla.setValueAt(rs.getString(2), 1 , 1);            

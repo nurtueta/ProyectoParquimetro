@@ -299,7 +299,7 @@ delimiter !
 						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LOCK IN SHARE MODE; 
 					SELECT hora_ent INTO hent FROM Estacionamientos 
 						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LOCK IN SHARE MODE;
-					SELECT id_parq INTO id_par_ent FROM Estacionamientos
+					SELECT id_parq INTO id_parq_ent FROM Estacionamientos
 							WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LOCK IN SHARE MODE;
 					SET tiempo = datediff(curdate(), fent)*24*60+time_to_sec(timediff(curtime(),hent))/60;
 					UPDATE Estacionamientos SET fecha_sal=curdate(), hora_sal=curtime() 
@@ -321,7 +321,7 @@ delimiter !
 						UPDATE Tarjetas SET saldo = nsaldo where Tarjetas.id_tarjeta = id_tarjeta;
 					END IF;
 					SELECT saldo INTO nsaldo FROM Tarjetas where Tarjetas.id_tarjeta = id_tarjeta LOCK IN SHARE MODE;
-					SELECT 'cierre' AS operacion, 'exito' AS resultado, nsaldo AS saldo;
+					SELECT 'cierre' AS operacion, 'exito' AS resultado, CONCAT( '$',nsaldo) AS saldo;
 				END IF;
 			COMMIT;
 		END; !
