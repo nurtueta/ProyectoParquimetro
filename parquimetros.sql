@@ -284,6 +284,7 @@ delimiter !
 			DECLARE nsaldo DECIMAL(5,2);
 			DECLARE tar DECIMAL(5,2) UNSIGNED;
 			DECLARE des DECIMAL(3,2) UNSIGNED;
+			DECLARE id_parq_ent INTEGER UNSIGNED;
 			DECLARE EXIT HANDLER FOR SQLEXCEPTION
 				BEGIN
 					SELECT 'SQLEXCEPTION!, transaccion abortada' AS resultado;
@@ -298,6 +299,8 @@ delimiter !
 						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LOCK IN SHARE MODE; 
 					SELECT hora_ent INTO hent FROM Estacionamientos 
 						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LOCK IN SHARE MODE;
+					SELECT id_parq INTO id_par_ent FROM Estacionamientos
+							WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LOCK IN SHARE MODE;
 					SET tiempo = datediff(curdate(), fent)*24*60+time_to_sec(timediff(curtime(),hent))/60;
 					UPDATE Estacionamientos SET fecha_sal=curdate(), hora_sal=curtime() 
 						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL;
@@ -309,7 +312,7 @@ delimiter !
 						SELECT tarifa INTO tar FROM (Ubicaciones JOIN Parquimetros 
 							ON Ubicaciones.calle = Parquimetros.calle 
 							AND Ubicaciones.altura = Parquimetros.altura) 
-							WHERE Parquimetros.id_parq = id_parq LIMIT 1 LOCK IN SHARE MODE;
+							WHERE Parquimetros.id_parq = id_parq_ent LIMIT 1 LOCK IN SHARE MODE;
 						IF (vsaldo - tiempo*(tar*(1-des))) < -999.99 THEN
 							SET nsaldo = -999.99;
 						ELSE
