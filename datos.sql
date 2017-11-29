@@ -30,7 +30,7 @@ INSERT INTO Tipos_tarjeta VALUES ('Gremio', 0.50);
 INSERT INTO Tipos_tarjeta VALUES ('Estudiante', 0.40);
 INSERT INTO Tipos_tarjeta VALUES ('Discapacidad', 1.00);
 
-# hay automoviles con mas de 1 tarjeta de cada tipo, automoviles con 0 tarjetas 
+# hay automoviles con mas de 1 tarjeta de cada tipo, automoviles con 0 tarjetas
 #y automoviles con mas de 1 tarjeta del mismo tipo
 INSERT INTO Tarjetas(saldo, tipo, patente) VALUES (066.75, 'Regular', 'AAAAAA');
 INSERT INTO Tarjetas(saldo, tipo, patente) VALUES (144.25, 'Regular', 'BBBBBB');
@@ -43,7 +43,7 @@ INSERT INTO Tarjetas(saldo, tipo, patente) VALUES (451.87, 'Discapacidad', 'HHHH
 INSERT INTO Tarjetas(saldo, tipo, patente) VALUES (849.25, 'Regular', 'IIIIII');
 INSERT INTO Tarjetas(saldo, tipo, patente) VALUES (002.45, 'Jubilado', 'JJJJJJ');
 INSERT INTO Tarjetas(saldo, tipo, patente) VALUES (000.00, 'Estudiante', 'KKKKKK');
-INSERT INTO Tarjetas(saldo, tipo, patente) VALUES (999.00, 'Jubilado', 'BBBBBB');
+INSERT INTO Tarjetas(saldo, tipo, patente) VALUES (100.00, 'Jubilado', 'BBBBBB');
 INSERT INTO Tarjetas(saldo, tipo, patente) VALUES (513.00, 'Regular', 'AAAAAA');
 
 INSERT INTO Inspectores VALUES (3111, 3111111111, 'Miguel', 'Sosa', md5('password'));

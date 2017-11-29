@@ -56,7 +56,7 @@ public class VenTarjeta extends JFrame{
 	 * Create the application.
 	 */
 	public void initGUI() {
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 516, 300);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		getContentPane().setLayout(null);
@@ -239,7 +239,7 @@ public class VenTarjeta extends JFrame{
 	private void crearTabla() {
 		tabla = new JTable(3,2);
 		tabla.setRowSelectionAllowed(false);
-		tabla.setBounds(12, 206, 400, 45);
+		tabla.setBounds(12, 206, 468, 45);
 		getContentPane().add(tabla);           
 	}
 	
@@ -273,9 +273,14 @@ public class VenTarjeta extends JFrame{
 			
 			// se recorre el resulset y se actualiza la tabla en pantalla
 			if(rs.first()){
-				if(rs.getMetaData().getColumnCount()==1) {
+				if(rs.getMetaData().getColumnCount()==1) {				
 					tabla.setValueAt(rs.getMetaData().getColumnName(1), 0, 0);
-					tabla.setValueAt(rs.getString(1), 0, 1);
+					tabla.setValueAt("", 1, 0);
+					tabla.setValueAt("", 2, 0);
+					
+					tabla.setValueAt(rs.getString(1), 0 , 1 );
+					tabla.setValueAt("", 1 , 1);            
+					tabla.setValueAt("", 2 , 1);
 				}else {
 					tabla.setValueAt(rs.getMetaData().getColumnName(1), 0, 0);
 					tabla.setValueAt(rs.getMetaData().getColumnName(2), 1, 0);
