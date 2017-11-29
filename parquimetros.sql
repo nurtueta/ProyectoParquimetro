@@ -302,9 +302,9 @@ delimiter !
 					SELECT 'cierre' AS operacion, 'error' AS resultado, 'parquimetro inexistente' AS causa;
 				ELSE
 					SELECT fecha_ent INTO fent FROM Estacionamientos 
-						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LIMIT 1 LOCK IN SHARE MODE; 
+						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LIMIT 1 FOR UPDATE; 
 					SELECT hora_ent INTO hent FROM Estacionamientos 
-						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LIMIT 1 LOCK IN SHARE MODE;
+						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LIMIT 1 FOR UPDATE;
 					SELECT id_parq INTO id_parq_ent FROM Estacionamientos
 							WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LIMIT 1 LOCK IN SHARE MODE;
 					SET tiempo = datediff(curdate(), fent)*24*60+time_to_sec(timediff(curtime(),hent))/60;
@@ -326,7 +326,7 @@ delimiter !
 						END IF;
 						UPDATE Tarjetas SET saldo = nsaldo WHERE Tarjetas.id_tarjeta = id_tarjeta;
 					END IF;
-					SELECT saldo INTO nsaldo FROM Tarjetas where Tarjetas.id_tarjeta = id_tarjeta LIMIT 1 LOCK IN SHARE MODE;
+					SELECT saldo INTO nsaldo FROM Tarjetas WHERE Tarjetas.id_tarjeta = id_tarjeta LIMIT 1 LOCK IN SHARE MODE;
 					SELECT 'cierre' AS operacion, 'exito' AS resultado, CONCAT( '$',nsaldo) AS saldo;
 				END IF;
 			COMMIT;
