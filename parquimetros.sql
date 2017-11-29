@@ -6,7 +6,7 @@ CREATE DATABASE parquimetros;
 USE parquimetros;
 
 #-------------------------------------------------------------------------
-# Creaci贸n Tablas para las entidades
+# Creaci髇 Tablas para las entidades
 
 CREATE TABLE Conductores (
  dni INT UNSIGNED NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE Parquimetros (
 	ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 #-------------------------------------------------------------------------
-# Creaci贸n Tablas para las relaciones
+# Creaci髇 Tablas para las relaciones
 
 CREATE TABLE Estacionamientos (
  id_tarjeta INT UNSIGNED NOT NULL,
@@ -198,7 +198,7 @@ CREATE TABLE Ventas(
 )ENGINE=InnoDB;
 
 #-------------------------------------------------------------------------
-# Creaci贸n de vistas 
+# Creaci髇 de vistas 
 
    CREATE VIEW estacionados as
    SELECT patente, calle, altura 
@@ -212,6 +212,8 @@ delimiter !
 		BEGIN
 			DECLARE ntarjetas INTEGER UNSIGNED;
 			DECLARE nestacionados INTEGER;
+			DECLARE pat CHAR(6);
+			DECLARE id_tarjeta2 INTEGER;
 			DECLARE EXIT HANDLER FOR SQLEXCEPTION
 				BEGIN
 					SELECT 'SQLEXCEPTION!, transaccion abortada' AS resultado;
@@ -223,11 +225,15 @@ delimiter !
 					SELECT 'N/A' AS operacion, 'error' AS resultado, 'no existe la tarjeta' AS causa;
 				ELSE
 					SET nestacionados = (SELECT COUNT(*) FROM estacionados JOIN Tarjetas 
-						ON estacionados.patente = Tarjetas.patente WHERE Tarjetas.id_tarjeta = id_tarjeta FOR UPDATE);
+						ON estacionados.patente = Tarjetas.patente WHERE Tarjetas.id_tarjeta = id_tarjeta LOCK IN SHARE MODE);
 					IF nestacionados = 0 THEN 
 						CALL apertura(id_tarjeta, id_parquimetro);
 					ELSE
-						CALL cierre(id_tarjeta, id_parquimetro);
+						SET pat = (SELECT patente FROM Tarjetas WHERE Tarjetas.id_tarjeta = id_tarjeta LIMIT 1 LOCK IN SHARE MODE);
+						SELECT tarjetas.id_tarjeta INTO id_tarjeta2 FROM 
+							tarjetas JOIN estacionamientos ON tarjetas.id_tarjeta = estacionamientos.id_tarjeta AND estacionamientos.fecha_sal IS NULL WHERE 
+							tarjetas.patente = pat LIMIT 1 LOCK IN SHARE MODE;
+						CALL cierre(id_tarjeta2, id_parquimetro);
 					END IF;
 				END IF;
 			COMMIT;
@@ -246,7 +252,7 @@ delimiter !
 					ROLLBACK;
 				END;
 			START TRANSACTION;
-				SET nparquimetros = (SELECT COUNT(*) FROM Parquimetros WHERE Parquimetros.id_parq = id_parq FOR UPDATE);
+				SET nparquimetros = (SELECT COUNT(*) FROM Parquimetros WHERE Parquimetros.id_parq = id_parq LOCK IN SHARE MODE);
 				IF nparquimetros = 0 THEN
 					SELECT 'apertura' AS operacion, 'error' AS resultado, 'parquimetro inexistente' AS causa;
 				ELSE
@@ -257,7 +263,7 @@ delimiter !
 						INSERT INTO Estacionamientos VALUES (id_tarjeta, id_parq, curdate(), curtime(), NULL, NULL);
 						SELECT 'apertura' AS operacion, 'exito' AS resultado, 'inf' AS tiempo;
 					ELSE
-						SELECT saldo INTO sal FROM Tarjetas WHERE Tarjetas.id_tarjeta = id_tarjeta LIMIT 1 FOR UPDATE;
+						SELECT saldo INTO sal FROM Tarjetas WHERE Tarjetas.id_tarjeta = id_tarjeta LIMIT 1 LOCK IN SHARE MODE;
 						IF sal>0 THEN
 							INSERT INTO Estacionamientos VALUES (id_tarjeta, id_parq, curdate(), curtime(), NULL, NULL);
 							SELECT tarifa INTO tar FROM (Ubicaciones JOIN Parquimetros 
@@ -296,11 +302,11 @@ delimiter !
 					SELECT 'cierre' AS operacion, 'error' AS resultado, 'parquimetro inexistente' AS causa;
 				ELSE
 					SELECT fecha_ent INTO fent FROM Estacionamientos 
-						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL FOR UPDATE; 
+						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LIMIT 1 LOCK IN SHARE MODE; 
 					SELECT hora_ent INTO hent FROM Estacionamientos 
-						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL FOR UPDATE;
+						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LIMIT 1 LOCK IN SHARE MODE;
 					SELECT id_parq INTO id_parq_ent FROM Estacionamientos
-							WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL FOR UPDATE;
+							WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LIMIT 1 LOCK IN SHARE MODE;
 					SET tiempo = datediff(curdate(), fent)*24*60+time_to_sec(timediff(curtime(),hent))/60;
 					UPDATE Estacionamientos SET fecha_sal=curdate(), hora_sal=curtime() 
 						WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL;
@@ -308,7 +314,7 @@ delimiter !
 						ON Tipos_tarjeta.tipo = Tarjetas.tipo) 
 						WHERE Tarjetas.id_tarjeta = id_tarjeta LIMIT 1 LOCK IN SHARE MODE;
 					IF des<1 THEN
-						SELECT saldo INTO vsaldo FROM Tarjetas where Tarjetas.id_tarjeta = id_tarjeta FOR UPDATE;
+						SELECT saldo INTO vsaldo FROM Tarjetas where Tarjetas.id_tarjeta = id_tarjeta LIMIT 1 FOR UPDATE;
 						SELECT tarifa INTO tar FROM (Ubicaciones JOIN Parquimetros 
 							ON Ubicaciones.calle = Parquimetros.calle 
 							AND Ubicaciones.altura = Parquimetros.altura) 
@@ -318,9 +324,9 @@ delimiter !
 						ELSE
 							SET nsaldo = (vsaldo - tiempo*(tar*(1-des)));
 						END IF;
-						UPDATE Tarjetas SET saldo = nsaldo where Tarjetas.id_tarjeta = id_tarjeta;
+						UPDATE Tarjetas SET saldo = nsaldo WHERE Tarjetas.id_tarjeta = id_tarjeta;
 					END IF;
-					SELECT saldo INTO nsaldo FROM Tarjetas where Tarjetas.id_tarjeta = id_tarjeta FOR UPDATE;
+					SELECT saldo INTO nsaldo FROM Tarjetas where Tarjetas.id_tarjeta = id_tarjeta LIMIT 1 LOCK IN SHARE MODE;
 					SELECT 'cierre' AS operacion, 'exito' AS resultado, CONCAT( '$',nsaldo) AS saldo;
 				END IF;
 			COMMIT;
@@ -337,7 +343,7 @@ delimiter ;
 	END; !
 	delimiter ;
 #-------------------------------------------------------------------------
-# Creaci贸n de usuarios y otorgamiento de privilegios
+# Creaci髇 de usuarios y otorgamiento de privilegios
 
 	CREATE USER admin@localhost IDENTIFIED BY 'admin';	
 	GRANT ALL PRIVILEGES ON parquimetros.* TO admin@localhost WITH GRANT OPTION;
