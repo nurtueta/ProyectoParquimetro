@@ -80,6 +80,7 @@ public class VenTarjeta extends JFrame{
 			while(rs.next()) {
 				boxTarjetas.addItem(rs.getInt(1));
 			}
+			boxTarjetas.setSelectedItem(null);
 			rs.close();
 			st.close();
 			
@@ -178,7 +179,8 @@ public class VenTarjeta extends JFrame{
 		
 		btnIngresar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(boxParquimetro.getSelectedItem()==null || boxNumero.getSelectedItem()==null)
+				if(boxParquimetro.getSelectedItem()==null || boxNumero.getSelectedItem()==null ||
+						boxTarjetas.getSelectedItem()==null)
 					JOptionPane.showMessageDialog(null,
 							"Faltan ingresar datos",
 							"Ingreso invalido",
@@ -203,6 +205,7 @@ public class VenTarjeta extends JFrame{
 							//ejecuto el procedimiento
 							txtConsulta="CALL conectar("+id_tarjeta+","+id_parquimetro+");";
 							refrescarTabla();
+							boxTarjetas.setSelectedItem(null);
 						}
 						
 						

@@ -327,7 +327,7 @@ delimiter !
           FROM Estacionamientos
 					WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LIMIT 1 FOR UPDATE;
 
-					SELECT id_parq INTO id_parq_ent
+					SELECT Estacionamientos.id_parq INTO id_parq_ent
           FROM Estacionamientos
 					WHERE Estacionamientos.id_tarjeta = id_tarjeta AND fecha_sal IS NULL AND hora_sal IS NULL LIMIT 1 LOCK IN SHARE MODE;
 
